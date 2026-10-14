@@ -85,6 +85,25 @@ export function Toggle({ checked, onChange, label }: { checked: boolean; onChang
   );
 }
 
+export function ChipToggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => Promise<void>; label: string }) {
+  const [value, setValue] = useState(checked);
+  const [pending, start] = useTransition();
+  return (
+    <button
+      type="button"
+      aria-pressed={value}
+      disabled={pending}
+      onClick={() => {
+        setValue(!value);
+        start(() => onChange(!value));
+      }}
+      className={`rounded-full px-2.5 py-1 text-xs font-medium transition ${value ? "bg-brand-600 text-white" : "bg-surface text-muted ring-1 ring-line hover:text-ink"}`}
+    >
+      {label}
+    </button>
+  );
+}
+
 const links = [
   { href: "/admin", label: "Dashboard", Icon: LayoutDashboard },
   { href: "/admin/properties", label: "Properties", Icon: Building2 },

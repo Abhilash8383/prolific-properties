@@ -2,6 +2,13 @@ export const CATEGORIES = ["Apartment", "Villa", "Duplex", "Plot", "Commercial"]
 export const LISTING_TYPES = ["Sale", "Rent"] as const;
 export const STATUSES = ["Ready to Move", "Under Construction", "New Launch"] as const;
 export const FEATURE_GROUPS = ["Interior", "Outdoor", "Utilities", "Other"] as const;
+export const PLACEMENTS = {
+  spotlight: { short: "Hero", label: "Home page: hero spotlight card", hint: "Only the newest one is shown" },
+  homeFeatured: { short: "Home", label: "Home page: Featured properties", hint: "Up to 6 are shown" },
+  footer: { short: "Footer", label: "Footer: Featured list on every page", hint: "Up to 3 are shown" },
+  pinned: { short: "Pinned", label: "Properties page: pinned to the top", hint: "Listed first when sorted by newest" },
+} as const;
+export type Placement = keyof typeof PLACEMENTS;
 
 export type Category = (typeof CATEGORIES)[number];
 export type ListingType = (typeof LISTING_TYPES)[number];
@@ -17,7 +24,7 @@ export type Property = {
   category: Category;
   listingType: ListingType;
   status: Status;
-  featured: boolean;
+  placements: Placement[];
   published: boolean;
   price: number;
   configurations: string;

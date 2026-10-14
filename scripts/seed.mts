@@ -252,7 +252,7 @@ const properties = seeds.map((s, i) => ({
   category: s.category,
   listingType: s.listingType ?? "Sale",
   status: s.status,
-  featured: s.featured ?? false,
+  placements: !s.featured ? [] : i === 0 ? ["spotlight", "homeFeatured", "footer", "pinned"] : ["homeFeatured", "footer"],
   published: true,
   price: s.price,
   configurations: s.configurations,

@@ -24,7 +24,7 @@ export function PropertyCard({ p, layout = "grid" }: { p: Property; layout?: "gr
         />
         )}
         <span className="absolute top-3 left-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-ink">{p.status}</span>
-        {p.featured && (
+        {(p.placements.includes("homeFeatured") || p.placements.includes("pinned")) && (
           <span className="absolute top-3 right-3 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white">Featured</span>
         )}
       </div>

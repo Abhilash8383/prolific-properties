@@ -1,7 +1,7 @@
 import { AdminForm } from "./client";
 import { Checkbox, Input, Panel, Select, Textarea } from "./fields";
 import { saveProperty } from "@/app/admin/actions";
-import { CATEGORIES, FEATURE_GROUPS, LISTING_TYPES, STATUSES, type Property } from "@/lib/types";
+import { CATEGORIES, FEATURE_GROUPS, LISTING_TYPES, PLACEMENTS, STATUSES, type Placement, type Property } from "@/lib/types";
 
 export function PropertyForm({ p }: { p?: Property }) {
   return (
@@ -83,7 +83,14 @@ export function PropertyForm({ p }: { p?: Property }) {
           </Panel>
           <Panel title="Visibility">
             <Checkbox label="Published on website" name="published" defaultChecked={p?.published ?? true} />
-            <Checkbox label="Featured on home page" name="featured" defaultChecked={p?.featured} />
+          </Panel>
+          <Panel title="Show this property on" text="Published properties always appear on the Properties page. Tick extra sections to promote it.">
+            {(Object.entries(PLACEMENTS) as [Placement, (typeof PLACEMENTS)[Placement]][]).map(([key, pl]) => (
+              <div key={key}>
+                <Checkbox label={pl.label} name="placements" value={key} defaultChecked={p?.placements.includes(key)} />
+                <p className="mt-0.5 pl-6.5 text-xs text-muted">{pl.hint}</p>
+              </div>
+            ))}
           </Panel>
         </div>
       </div>

@@ -8,7 +8,7 @@ import { collection, imageBucket } from "@/lib/db";
 import { createSession, destroySession, requireAdmin } from "@/lib/auth";
 import { TAGS } from "@/lib/data";
 import { slugify } from "@/lib/format";
-import { CATEGORIES, ENQUIRY_STATUSES, FEATURE_GROUPS, LISTING_TYPES, STATUSES } from "@/lib/types";
+import { CATEGORIES, ENQUIRY_STATUSES, FEATURE_GROUPS, LISTING_TYPES, PLACEMENTS, STATUSES, type Placement } from "@/lib/types";
 
 export type FormState = { ok?: boolean; error?: string; message?: string } | null;
 
@@ -124,7 +124,7 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
       category: oneOf(str(f, "category"), CATEGORIES),
       listingType: oneOf(str(f, "listingType"), LISTING_TYPES),
       status: oneOf(str(f, "status"), STATUSES),
-      featured: f.get("featured") === "on",
+      placements: f.getAll("placements").filter((v): v is Placement => typeof v === "string" && v in PLACEMENTS),
       published: f.get("published") === "on",
       price: num(f, "price"),
       configurations: str(f, "configurations", 200),
@@ -169,9 +169,19 @@ export async function deleteProperty(id: string) {
   updateTag(TAGS.properties);
 }
 
-export async function togglePropertyField(id: string, field: "published" | "featured", value: boolean) {
+export async function togglePropertyField(id: string, field: "published", value: boolean) {
   await requireAdmin();
   await (await collection("properties")).updateOne({ _id: oid(id) }, { $set: { [field]: value, updatedAt: new Date() } });
+  updateTag(TAGS.properties);
+}
+
+export async function togglePlacement(id: string, placement: Placement, on: boolean) {
+  await requireAdmin();
+  if (!(placement in PLACEMENTS)) return;
+  await (await collection("properties")).updateOne(
+    { _id: oid(id) },
+    { [on ? "$addToSet" : "$pull"]: { placements: placement }, $set: { updatedAt: new Date() } },
+  );
   updateTag(TAGS.properties);
 }
 

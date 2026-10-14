@@ -63,7 +63,7 @@ export async function Footer() {
           <h3 className="mb-5 text-sm font-semibold tracking-widest text-white uppercase">Featured</h3>
           <ul className="space-y-4">
             {properties
-              .filter((p) => p.featured)
+              .filter((p) => p.placements.includes("footer"))
               .slice(0, 3)
               .map((p) => (
                 <li key={p.slug}>

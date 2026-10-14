@@ -54,7 +54,7 @@ export function PropertyBrowser({ properties }: { properties: Property[] }) {
           ? b.price - a.price
           : sort === "size-desc"
             ? b.sqft - a.sqft
-            : b.createdAt.localeCompare(a.createdAt),
+            : Number(b.placements.includes("pinned")) - Number(a.placements.includes("pinned")) || b.createdAt.localeCompare(a.createdAt),
     );
 
   const select = (k: string, label: string, options: (string | { value: string; label: string })[]) => (

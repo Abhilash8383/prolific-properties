@@ -33,10 +33,10 @@ export default async function Home() {
     getTestimonials(),
     getPosts(),
   ]);
-  const featured = properties.filter((p) => p.featured);
+  const featured = properties.filter((p) => p.placements.includes("homeFeatured"));
   const cities = [...new Set(properties.map((p) => p.city))];
   const { stats, developers } = site;
-  const spotlight = featured[0] ?? properties[0];
+  const spotlight = properties.find((p) => p.placements.includes("spotlight")) ?? properties[0];
 
   return (
     <>
@@ -165,6 +165,7 @@ export default async function Home() {
       </section>
 
       {/* Featured */}
+      {featured.length > 0 && (
       <section className="container-x py-16 md:py-24">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading
@@ -180,14 +181,15 @@ export default async function Home() {
           </Link>
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.slice(0, 3).map((p) => (
+          {featured.slice(0, 6).map((p) => (
             <PropertyCard key={p.slug} p={p} />
           ))}
         </div>
       </section>
+      )}
 
       {/* Browse by type */}
-      <section className="container-x pb-16 md:pb-24">
+      <section className={`container-x pb-16 md:pb-24 ${featured.length ? "" : "pt-16 md:pt-24"}`}>
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
           {(
             [

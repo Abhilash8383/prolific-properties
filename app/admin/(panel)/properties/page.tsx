@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, Plus } from "lucide-react";
-import { ConfirmButton, Toggle } from "@/components/admin/client";
+import { ChipToggle, ConfirmButton, Toggle } from "@/components/admin/client";
 import { PageHeader, primaryButton } from "@/components/admin/fields";
 import { adminProperties } from "@/lib/admin-data";
 import { formatPrice } from "@/lib/format";
-import { deleteProperty, togglePropertyField } from "../../actions";
+import { PLACEMENTS, type Placement } from "@/lib/types";
+import { deleteProperty, togglePlacement, togglePropertyField } from "../../actions";
 
 export const instant = false;
 
@@ -30,7 +31,7 @@ export default async function AdminProperties() {
               <th className="px-4 py-3 font-medium">Type</th>
               <th className="px-4 py-3 font-medium">Price</th>
               <th className="px-4 py-3 font-medium">Published</th>
-              <th className="px-4 py-3 font-medium">Featured</th>
+              <th className="px-4 py-3 font-medium">Also shown on</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>
@@ -60,7 +61,13 @@ export default async function AdminProperties() {
                   <Toggle label="Published" checked={p.published} onChange={togglePropertyField.bind(null, p.id, "published")} />
                 </td>
                 <td className="px-4 py-3">
-                  <Toggle label="Featured" checked={p.featured} onChange={togglePropertyField.bind(null, p.id, "featured")} />
+                  <div className="flex gap-1.5">
+                    {(Object.keys(PLACEMENTS) as Placement[]).map((key) => (
+                      <span key={key} title={PLACEMENTS[key].label}>
+                        <ChipToggle label={PLACEMENTS[key].short} checked={p.placements.includes(key)} onChange={togglePlacement.bind(null, p.id, key)} />
+                      </span>
+                    ))}
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-4 whitespace-nowrap">
