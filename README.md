@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Prolific Properties
 
-## Getting Started
+Property listing website with an admin panel, built with Next.js and MongoDB.
 
-First, run the development server:
+## Requirements
+
+- Node.js 24+
+- Docker (for the local MongoDB)
+
+## First-time setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # then fill in the values
+npm run db:up                # start MongoDB in Docker
+npm run seed                 # load sample properties, blog posts, testimonials, jobs, settings and the admin user
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The admin login is created from `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env.local` the first time you run the seed.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Start
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run db:up
+npm run dev
+```
 
-## Learn More
+- Website: [http://localhost:3000](http://localhost:3000)
+- Admin panel: [http://localhost:3000/admin](http://localhost:3000/admin)
 
-To learn more about Next.js, take a look at the following resources:
+## Stop
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Press `Ctrl + C` in the terminal running `npm run dev`, then:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run db:down
+```
 
-## Deploy on Vercel
+Your data is kept in the `mongo-data` Docker volume, so it is still there the next time you run `npm run db:up`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Reset to sample data
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run seed
+```
+
+This replaces properties, blog posts, testimonials, jobs and site settings with the sample data. The admin account and enquiries are kept. Restart `npm run dev` afterwards so the site picks up the new data.
+
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `npm run db:up` | Start MongoDB in Docker |
+| `npm run db:down` | Stop and remove the MongoDB container (data is kept) |
+| `npm run seed` | Load the sample data |
+| `npm run dev` | Start the development server |
+| `npm run build` | Production build (MongoDB must be running) |
+| `npm run start` | Run the production build |
+| `npm run lint` | Lint the code |
