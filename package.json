@@ -13,6 +13,7 @@
     "seed": "node --env-file=.env.local scripts/seed.mts"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.3",
     "jose": "^6.2.12",
     "lucide-react": "^1.57.0",
