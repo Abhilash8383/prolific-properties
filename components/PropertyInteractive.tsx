@@ -83,7 +83,7 @@ const noop = () => () => {};
 
 export function ScheduleTour({ title }: { title: string }) {
   const today = useSyncExternalStore(noop, () => new Date().toDateString(), () => null);
-  const [day, setDay] = useState(1);
+  const [day, setDay] = useState(0);
   const [time, setTime] = useState(times[0]);
   const [mode, setMode] = useState<"In person" | "Video chat">("In person");
 

@@ -57,7 +57,7 @@ export default async function AdminSettings() {
               name="stats"
               rows={4}
               defaultValue={s.stats.map((x) => `${x.value} | ${x.label}`).join("\n")}
-              hint="One per line: value | label (e.g. 12+ | Years of experience). The first three appear in the home hero."
+              hint="One per line: value | label (e.g. 12+ | Years of experience). Shown on the About page."
             />
             <Textarea label="Developer partners" name="developers" rows={5} defaultValue={s.developers.join("\n")} hint="One name per line" />
           </Panel>

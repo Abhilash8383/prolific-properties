@@ -23,8 +23,8 @@ export default async function ContactPage() {
       <section className="container-x grid gap-8 py-12 md:py-24 lg:grid-cols-2 lg:gap-10">
         <div className="min-w-0">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-            {cards.map(({ Icon, title, value, href }) => (
-              <a key={title} href={href} className="flex items-start gap-4 rounded-2xl border border-line p-4 transition hover:border-brand-300 sm:block sm:p-6">
+            {cards.map(({ Icon, title, value, href }) => {
+              const content = <>
                 <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600">
                   <Icon className="size-5" />
                 </span>
@@ -32,8 +32,14 @@ export default async function ContactPage() {
                   <span className="block text-sm text-muted sm:mt-4">{title}</span>
                   <span className="mt-1 block font-semibold break-words text-ink">{value}</span>
                 </span>
-              </a>
-            ))}
+              </>;
+              const className = "flex items-start gap-4 rounded-2xl border border-line p-4 sm:block sm:p-6";
+              return href ? (
+                <a key={title} href={href} className={`${className} transition hover:border-brand-300`}>{content}</a>
+              ) : (
+                <div key={title} className={className}>{content}</div>
+              );
+            })}
           </div>
           <div className="mt-6 flex flex-wrap gap-2">
             {socials.filter(({ key }) => site.social[key]).map(({ key, label, Icon }) => (

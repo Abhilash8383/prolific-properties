@@ -39,16 +39,20 @@ async function uploadImages(f: FormData, key: string) {
   for (const file of files) {
     if (!isAcceptedImageType(file.type)) throw new Error(`${file.name} must be a JPG, PNG or WebP image`);
   }
-  const bucket = files.length ? await imageBucket() : null;
-  const urls: string[] = [];
-  for (const file of files) {
+  const validated = await Promise.all(files.map(async (file) => {
     const data = Buffer.from(await file.arrayBuffer());
     const jpeg = data[0] === 0xff && data[1] === 0xd8 && data[2] === 0xff;
     const png = data.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
     const webp = data.toString("ascii", 0, 4) === "RIFF" && data.toString("ascii", 8, 12) === "WEBP";
     const valid = file.type === "image/jpeg" ? jpeg : file.type === "image/png" ? png : webp;
     if (!valid) throw new Error(`${file.name} is not a valid ${file.type.slice(6).toUpperCase()} image`);
-    const upload = bucket!.openUploadStream(file.name, { metadata: { contentType: file.type } });
+    return { file, data };
+  }));
+  if (!validated.length) return [];
+  const bucket = await imageBucket();
+  const urls: string[] = [];
+  for (const { file, data } of validated) {
+    const upload = bucket.openUploadStream(file.name, { metadata: { contentType: file.type } });
     await new Promise<void>((resolve, reject) => {
       upload.on("finish", () => resolve());
       upload.on("error", reject);

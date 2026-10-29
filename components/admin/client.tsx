@@ -96,7 +96,13 @@ export function Toggle({ checked, onChange, label }: { checked: boolean; onChang
       disabled={pending}
       onClick={() => {
         setValue(!value);
-        start(() => onChange(!value));
+        start(async () => {
+          try {
+            await onChange(!value);
+          } catch {
+            setValue(value);
+          }
+        });
       }}
       className={`relative h-6 w-11 shrink-0 rounded-full transition ${value ? "bg-brand-600" : "bg-line"}`}
     >
@@ -115,7 +121,13 @@ export function ChipToggle({ checked, onChange, label }: { checked: boolean; onC
       disabled={pending}
       onClick={() => {
         setValue(!value);
-        start(() => onChange(!value));
+        start(async () => {
+          try {
+            await onChange(!value);
+          } catch {
+            setValue(value);
+          }
+        });
       }}
       className={`rounded-full px-2.5 py-1 text-xs font-medium transition ${value ? "bg-brand-600 text-white" : "bg-surface text-muted ring-1 ring-line hover:text-ink"}`}
     >
