@@ -4,8 +4,9 @@ import { EnquiryForm } from "@/components/EnquiryForm";
 import { PageHero, SectionHeading } from "@/components/ui";
 import { img } from "@/lib/site";
 import { getJobs, getSettings } from "@/lib/data";
+import { seoMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Career" };
+export const metadata: Metadata = seoMetadata({ title: "Careers in Bhubaneswar Real Estate", description: "Explore career opportunities with the Prolific Properties team in Bhubaneswar, Odisha.", path: "/career" });
 
 export default async function CareerPage() {
   const [site, jobs] = await Promise.all([getSettings(), getJobs()]);

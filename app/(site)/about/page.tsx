@@ -4,8 +4,9 @@ import { Eye, FileCheck2, Home, Scale, Target } from "lucide-react";
 import { PageHero, SectionHeading } from "@/components/ui";
 import { img } from "@/lib/site";
 import { getSettings } from "@/lib/data";
+import { seoMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "About Us" };
+export const metadata: Metadata = seoMetadata({ title: "About Our Bhubaneswar Property Team", description: "Learn about Prolific Properties, our local real estate team, and how we help buyers find homes and commercial property across Odisha.", path: "/about" });
 
 const promises = [
   { Icon: Home, title: "Easy home buying", text: "We make owning a home simple with expert guidance at every step of the process." },
@@ -29,9 +30,8 @@ export default async function AboutPage() {
               embark on the journey to your dream home in Odisha.
             </p>
             <p>
-              With a market presence spanning over a decade and more than a thousand homes delivered to happy families, we&apos;ve grown from a
-              team of two into a team of over twenty, and we&apos;re still growing. Whether it&apos;s a commercial space, an office or a home for
-              yourself, we&apos;ve got you covered.
+              From apartments and villas to plots and commercial spaces, we help buyers compare options in Bhubaneswar and across Odisha.
+              Our team can help you shortlist properties, arrange visits and understand the next steps.
             </p>
             <p>
               Buying or selling a home is one of the most significant decisions you&apos;ll ever make. That&apos;s why we&apos;re dedicated to exceptional

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/LegalPage";
+import { seoMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Privacy Policy" };
+export const metadata: Metadata = seoMetadata({ title: "Privacy Policy", description: "How Prolific Properties handles information submitted through our website and property enquiry forms.", path: "/privacy-policy" });
 
 export default function PrivacyPage() {
   return (

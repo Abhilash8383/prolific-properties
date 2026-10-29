@@ -3,8 +3,9 @@ import { PageHero } from "@/components/ui";
 import { PostCard } from "@/components/PostCard";
 import { getPosts } from "@/lib/data";
 import { img } from "@/lib/site";
+import { seoMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Blog" };
+export const metadata: Metadata = seoMetadata({ title: "Bhubaneswar Real Estate Insights", description: "Read local guides and updates on buying property, home loans, neighbourhoods and real estate in Bhubaneswar and Odisha.", path: "/blog" });
 
 export default async function BlogPage() {
   const posts = await getPosts();

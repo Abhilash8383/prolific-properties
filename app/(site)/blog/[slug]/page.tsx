@@ -6,12 +6,14 @@ import { ArrowLeft } from "lucide-react";
 import { PostCard } from "@/components/PostCard";
 import { formatDate } from "@/lib/format";
 import { getPost, getPosts } from "@/lib/data";
+import { JsonLd } from "@/components/JsonLd";
+import { absoluteUrl, seoMetadata } from "@/lib/seo";
 
 export const instant = false;
 
 export async function generateMetadata({ params }: PageProps<"/blog/[slug]">): Promise<Metadata> {
   const post = await getPost((await params).slug);
-  return post ? { title: post.title, description: post.excerpt } : {};
+  return post ? seoMetadata({ title: post.title, description: post.excerpt, path: `/blog/${post.slug}`, image: post.coverImage || undefined, type: "article", publishedTime: post.publishedAt, modifiedTime: post.updatedAt }) : {};
 }
 
 // Supports blank-line separated paragraphs, "## " / "### " headings and "- " bullet lists.
@@ -54,6 +56,28 @@ export default async function PostPage({ params }: PageProps<"/blog/[slug]">) {
 
   return (
     <article className="pb-16 md:pb-24">
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "BlogPosting",
+            "@id": `${absoluteUrl(`/blog/${post.slug}`)}#article`,
+            headline: post.title,
+            description: post.excerpt,
+            image: post.coverImage ? absoluteUrl(post.coverImage) : undefined,
+            datePublished: post.publishedAt,
+            dateModified: post.updatedAt,
+            author: { "@type": "Person", name: post.author },
+            publisher: { "@id": `${absoluteUrl("/")}#organization` },
+            mainEntityOfPage: absoluteUrl(`/blog/${post.slug}`),
+          },
+          { "@type": "BreadcrumbList", itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
+            { "@type": "ListItem", position: 2, name: "Blog", item: absoluteUrl("/blog") },
+            { "@type": "ListItem", position: 3, name: post.title, item: absoluteUrl(`/blog/${post.slug}`) },
+          ] },
+        ],
+      }} />
       <header className="container-x max-w-3xl pt-10 md:pt-16">
         <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-brand-700">
           <ArrowLeft className="size-4" /> All articles

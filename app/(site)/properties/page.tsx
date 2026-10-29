@@ -4,8 +4,9 @@ import { PageHero } from "@/components/ui";
 import { PropertyBrowser } from "@/components/PropertyBrowser";
 import { getProperties } from "@/lib/data";
 import { img } from "@/lib/site";
+import { seoMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Properties" };
+export const metadata: Metadata = seoMetadata({ title: "Properties in Bhubaneswar & Odisha", description: "Browse apartments, villas, duplex homes, plots and commercial properties for sale or rent in Bhubaneswar and Odisha. Filter by location, type and budget.", path: "/properties" });
 
 export default async function PropertiesPage() {
   const properties = await getProperties();

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -30,6 +31,13 @@ import {
 } from "@/lib/data";
 import { CATEGORIES } from "@/lib/types";
 import { img } from "@/lib/site";
+import { seoMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = seoMetadata({
+  title: "Property in Bhubaneswar | Apartments, Villas & Plots",
+  description: "Find apartments, villas, duplex homes and plots in Bhubaneswar. Browse local property listings and get help with shortlisting, visits and home buying.",
+  path: "/",
+});
 
 const propertyTypes = [
   { category: "Apartment", label: "Apartments", hint: "Easy city living", Icon: Building2 },
@@ -180,7 +188,7 @@ export default async function Home() {
             View all properties <ArrowRight className="size-4" />
           </Link>
         </div>
-        <div className="-mx-5 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
+        <div className="no-scrollbar -mx-5 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
           {featured.map((p) => (
             <div key={p.slug} className="w-[min(82vw,22rem)] shrink-0 snap-start sm:w-auto">
               <PropertyCard p={p} />
@@ -225,7 +233,7 @@ export default async function Home() {
               <SectionHeading eyebrow="Explore locations" title="Find a home in the right neighbourhood" text="Browse the areas where we currently have homes." />
               <Link href="/properties" className="inline-flex items-center gap-2 font-semibold text-brand-700">All locations <ArrowRight className="size-4" /></Link>
             </div>
-            <div className="-mx-5 mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-5">
+            <div className="no-scrollbar -mx-5 mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-5">
               {areas.map(([area, details]) => (
                 <Link key={area} href={`/properties?q=${encodeURIComponent(area)}`} className="group relative aspect-4/3 w-[72vw] max-w-72 shrink-0 snap-start overflow-hidden rounded-2xl sm:aspect-3/4 sm:w-auto sm:max-w-none lg:aspect-4/5">
                   <Image src={details.image} alt="" fill sizes="(min-width:1024px) 20vw, (min-width:640px) 50vw, 100vw" className="object-cover transition duration-500 group-hover:scale-105" />

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/LegalPage";
+import { seoMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Terms & Conditions" };
+export const metadata: Metadata = seoMetadata({ title: "Terms & Conditions", description: "Terms for using the Prolific Properties website and its property information.", path: "/terms" });
 
 export default function TermsPage() {
   return (

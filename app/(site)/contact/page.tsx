@@ -5,8 +5,9 @@ import { PageHero } from "@/components/ui";
 import { socials } from "@/components/icons";
 import { img } from "@/lib/site";
 import { getSettings } from "@/lib/data";
+import { seoMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Contact Us" };
+export const metadata: Metadata = seoMetadata({ title: "Contact a Property Advisor in Bhubaneswar", description: "Contact Prolific Properties in Saheed Nagar, Bhubaneswar for property enquiries, site visits and local home buying guidance.", path: "/contact" });
 
 export default async function ContactPage() {
   const site = await getSettings();

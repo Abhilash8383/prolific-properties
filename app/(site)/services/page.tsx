@@ -4,14 +4,15 @@ import { ArrowRight } from "lucide-react";
 import { PageHero, SectionHeading } from "@/components/ui";
 import { serviceIcons } from "@/components/icons";
 import { img, services } from "@/lib/site";
+import { seoMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Services" };
+export const metadata: Metadata = seoMetadata({ title: "Real Estate Services in Bhubaneswar", description: "Get help finding and buying property in Bhubaneswar, from shortlisting and site visits to home loans, documentation and registration.", path: "/services" });
 
 const steps = [
   ["Tell us what you need", "Share your budget, preferred locations and must-haves with an advisor."],
   ["Shortlist & visit", "We curate verified options and arrange guided site visits, in person or on video."],
-  ["Negotiate & finance", "We get you the best price and handle your home loan from application to sanction."],
-  ["Register & move in", "Our legal team handles documentation and registration until you get the keys."],
+  ["Compare & finance", "We help you compare prices and explore home loan options for your budget."],
+  ["Register & move in", "We coordinate paperwork and registration so you know what comes next."],
 ];
 
 export default function ServicesPage() {

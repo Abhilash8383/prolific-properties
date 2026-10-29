@@ -9,12 +9,19 @@ import { WhatsApp } from "@/components/icons";
 import { formatPrice } from "@/lib/format";
 import { getProperties, getProperty, getSettings } from "@/lib/data";
 import { whatsappLink } from "@/lib/site";
+import { JsonLd } from "@/components/JsonLd";
+import { absoluteUrl, seoMetadata } from "@/lib/seo";
 
 export const instant = false;
 
 export async function generateMetadata({ params }: PageProps<"/properties/[slug]">): Promise<Metadata> {
   const p = await getProperty((await params).slug);
-  return p ? { title: p.title, description: p.summary } : {};
+  return p ? seoMetadata({
+    title: `${p.title} | ${p.category} in ${p.area}, ${p.city}`,
+    description: `${p.title}: ${p.category.toLowerCase()} for ${p.listingType.toLowerCase()} in ${p.area}, ${p.city}. ${formatPrice(p)}. ${p.summary}`.slice(0, 290),
+    path: `/properties/${p.slug}`,
+    image: p.images[0],
+  }) : {};
 }
 
 function Card({ title, id, children }: { title: string; id?: string; children: React.ReactNode }) {
@@ -58,6 +65,35 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[s
 
   return (
     <div className="bg-surface pb-28 lg:pb-24">
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "RealEstateListing",
+            "@id": `${absoluteUrl(`/properties/${p.slug}`)}#listing`,
+            url: absoluteUrl(`/properties/${p.slug}`),
+            name: p.title,
+            description: p.summary,
+            image: p.images.map(absoluteUrl),
+            datePosted: p.createdAt,
+            dateModified: p.updatedAt,
+            mainEntity: {
+              "@type": p.category === "Apartment" ? "Apartment" : p.category === "Villa" || p.category === "Duplex" ? "House" : "Place",
+              name: p.title,
+              address: { "@type": "PostalAddress", addressLocality: p.city, addressRegion: p.state, addressCountry: "IN", streetAddress: p.area },
+              floorSize: p.sqft > 0 ? { "@type": "QuantitativeValue", value: p.sqft, unitCode: "FTK" } : undefined,
+              numberOfBedrooms: p.bedrooms || undefined,
+              numberOfBathroomsTotal: p.bathrooms || undefined,
+            },
+            offers: { "@type": "Offer", price: p.price, priceCurrency: "INR", availability: "https://schema.org/InStock", seller: { "@id": `${absoluteUrl("/")}#organization` } },
+          },
+          { "@type": "BreadcrumbList", itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
+            { "@type": "ListItem", position: 2, name: "Properties", item: absoluteUrl("/properties") },
+            { "@type": "ListItem", position: 3, name: p.title, item: absoluteUrl(`/properties/${p.slug}`) },
+          ] },
+        ],
+      }} />
       <div className="container-x pt-6 md:pt-8">
         <nav className="flex flex-wrap items-center gap-1 text-sm text-muted">
           <Link href="/" className="hover:text-ink">Home</Link>
