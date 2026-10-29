@@ -9,10 +9,6 @@ import { getPost, getPosts } from "@/lib/data";
 
 export const instant = false;
 
-export async function generateStaticParams() {
-  return (await getPosts()).map((p) => ({ slug: p.slug }));
-}
-
 export async function generateMetadata({ params }: PageProps<"/blog/[slug]">): Promise<Metadata> {
   const post = await getPost((await params).slug);
   return post ? { title: post.title, description: post.excerpt } : {};

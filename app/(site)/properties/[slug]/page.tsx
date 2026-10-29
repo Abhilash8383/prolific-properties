@@ -10,12 +10,7 @@ import { formatPrice } from "@/lib/format";
 import { getProperties, getProperty, getSettings } from "@/lib/data";
 import { whatsappLink } from "@/lib/site";
 
-// Every slug is prerendered by generateStaticParams, so blocking on params is fine.
 export const instant = false;
-
-export async function generateStaticParams() {
-  return (await getProperties()).map((p) => ({ slug: p.slug }));
-}
 
 export async function generateMetadata({ params }: PageProps<"/properties/[slug]">): Promise<Metadata> {
   const p = await getProperty((await params).slug);
