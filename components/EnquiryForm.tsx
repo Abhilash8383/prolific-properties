@@ -45,9 +45,9 @@ export function EnquiryForm({
       <input name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
       {fields.map((f) =>
         f.textarea ? (
-          <textarea key={f.name} name={f.name} placeholder={f.name} rows={4} className={inputClass} />
+          <textarea key={f.name} name={f.name} aria-label={f.name} placeholder={f.name} rows={4} className={inputClass} />
         ) : f.options ? (
-          <select key={f.name} name={f.name} required={f.required} className={inputClass} defaultValue="">
+          <select key={f.name} name={f.name} aria-label={f.name} required={f.required} className={inputClass} defaultValue="">
             <option value="" disabled>
               {f.name}
               {f.required && " *"}
@@ -60,6 +60,7 @@ export function EnquiryForm({
           <input
             key={f.name}
             name={f.name}
+            aria-label={f.name}
             type={f.type ?? "text"}
             required={f.required}
             placeholder={f.name + (f.required ? " *" : "")}

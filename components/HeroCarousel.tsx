@@ -50,6 +50,7 @@ export function HeroCarousel({
   return (
     <div
       className="relative"
+      role="region"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}

@@ -35,7 +35,9 @@ export function Gallery({ images, title }: { images: string[]; title: string }) 
       <div className="no-scrollbar flex gap-2 overflow-x-auto sm:gap-3 md:flex-col md:overflow-y-auto">
         {images.map((src, i) => (
           <button
-            key={src}
+            key={`${src}-${i}`}
+            aria-label={`View photo ${i + 1} of ${images.length}`}
+            aria-pressed={i === active}
             onClick={() => setActive(i)}
             className={`relative aspect-4/3 w-20 shrink-0 overflow-hidden rounded-xl ring-2 transition sm:w-28 sm:rounded-2xl md:w-full ${
               i === active ? "ring-brand-600" : "opacity-70 ring-transparent hover:opacity-100"
@@ -130,7 +132,7 @@ export function ScheduleTour({ title }: { title: string }) {
           </button>
         ))}
       </div>
-      <select value={time} onChange={(e) => setTime(e.target.value)} className={inputClass}>
+      <select value={time} onChange={(e) => setTime(e.target.value)} aria-label="Preferred tour time" className={inputClass}>
         {times.map((t) => (
           <option key={t}>{t}</option>
         ))}
@@ -141,6 +143,7 @@ export function ScheduleTour({ title }: { title: string }) {
             type="button"
             key={m}
             onClick={() => setMode(m)}
+            aria-pressed={mode === m}
             className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-medium ${
               mode === m ? "border-brand-600 bg-brand-50 text-brand-700" : "border-line text-muted"
             }`}
@@ -149,8 +152,8 @@ export function ScheduleTour({ title }: { title: string }) {
           </button>
         ))}
       </div>
-      <input name="Your name" required placeholder="Your name *" className={inputClass} />
-      <input name="Mobile" type="tel" required placeholder="Mobile *" className={inputClass} />
+      <input name="Your name" aria-label="Your name" required placeholder="Your name *" className={inputClass} />
+      <input name="Mobile" aria-label="Mobile number" type="tel" required placeholder="Mobile *" className={inputClass} />
       {state?.error && <p className="text-sm font-medium text-red-600">{state.error}</p>}
       <button disabled={pending} className="w-full rounded-xl bg-ink py-3.5 font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60">
         {pending ? "Sending..." : "Schedule a tour"}

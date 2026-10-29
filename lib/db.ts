@@ -5,10 +5,16 @@ const uri = process.env.MONGODB_URI;
 if (!uri) throw new Error("MONGODB_URI is not set");
 
 const g = globalThis as unknown as { _mongo?: Promise<MongoClient> };
-const clientPromise = (g._mongo ??= new MongoClient(uri).connect());
+function client() {
+  g._mongo ??= new MongoClient(uri!).connect().catch((error) => {
+    g._mongo = undefined;
+    throw error;
+  });
+  return g._mongo;
+}
 
 export async function db() {
-  return (await clientPromise).db();
+  return (await client()).db();
 }
 
 export async function collection<T extends Document = Document>(name: string) {

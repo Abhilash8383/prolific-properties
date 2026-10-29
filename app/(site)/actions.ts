@@ -2,6 +2,7 @@
 
 import { collection } from "@/lib/db";
 import { ENQUIRY_TYPES, type Enquiry } from "@/lib/types";
+import { allowRequest } from "@/lib/rate-limit";
 
 export type EnquiryState = { ok: boolean; error?: string } | null;
 
@@ -39,6 +40,10 @@ export async function submitEnquiry(_prev: EnquiryState, form: FormData): Promis
 
   if (!doc.name || !/^[+\d][\d\s-]{6,}$/.test(doc.phone)) {
     return { ok: false, error: "Please enter your name and a valid mobile number." };
+  }
+
+  if (!(await allowRequest("enquiry", 10))) {
+    return { ok: false, error: "Too many requests. Please try again in 15 minutes." };
   }
 
   await (await collection("enquiries")).insertOne(doc);

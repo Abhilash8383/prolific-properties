@@ -9,12 +9,16 @@ import { createSession, destroySession, requireAdmin } from "@/lib/auth";
 import { TAGS } from "@/lib/data";
 import { slugify } from "@/lib/format";
 import { MAX_UPLOAD_BYTES, isAcceptedImageType } from "@/lib/upload";
+import { allowRequest } from "@/lib/rate-limit";
 import { CATEGORIES, ENQUIRY_STATUSES, FEATURE_GROUPS, LISTING_TYPES, PLACEMENTS, STATUSES, type Placement } from "@/lib/types";
 
 export type FormState = { ok?: boolean; error?: string; message?: string } | null;
 
 const str = (f: FormData, k: string, max = 5000) => String(f.get(k) ?? "").trim().slice(0, max);
-const num = (f: FormData, k: string) => Math.max(0, Number(f.get(k)) || 0);
+const num = (f: FormData, k: string) => {
+  const value = Number(f.get(k));
+  return Number.isFinite(value) ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, value)) : 0;
+};
 const lines = (f: FormData, k: string) =>
   str(f, k, 20000)
     .split("\n")
@@ -84,6 +88,9 @@ async function guard<T>(fn: () => Promise<T>): Promise<T | { error: string }> {
 /* ---------- Auth ---------- */
 
 export async function login(_prev: FormState, f: FormData): Promise<FormState> {
+  if (!(await allowRequest("admin-login", 12))) {
+    return { error: "Too many sign-in attempts. Please try again in 15 minutes." };
+  }
   const email = str(f, "email", 200).toLowerCase();
   const password = String(f.get("password") ?? "");
   const admin = await (await collection("admins")).findOne({ email });
