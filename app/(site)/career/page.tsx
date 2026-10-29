@@ -42,7 +42,7 @@ export default async function CareerPage() {
               </span>
               <span>
                 <span className="block font-semibold">Email us your resume</span>
-                <span className="break-all text-brand-100">{site.hrEmail}</span>
+                <span className="break-all text-white">{site.hrEmail}</span>
               </span>
             </a>
           </div>

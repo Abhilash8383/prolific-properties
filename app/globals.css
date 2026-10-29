@@ -5,21 +5,21 @@
 }
 
 @theme {
-  --color-brand-50: #eef8fe;
-  --color-brand-100: #d9effb;
-  --color-brand-200: #b6dff5;
-  --color-brand-300: #8cc7eb;
-  --color-brand-400: #4ca4d6;
-  --color-brand-500: #2588c6;
+  --color-brand-50: rgb(15 117 188 / 5%);
+  --color-brand-100: rgb(15 117 188 / 12%);
+  --color-brand-200: rgb(15 117 188 / 24%);
+  --color-brand-300: rgb(15 117 188 / 40%);
+  --color-brand-400: #0f75bc;
+  --color-brand-500: #0f75bc;
   --color-brand-600: #0f75bc;
-  --color-brand-700: #0c639d;
-  --color-brand-800: #0b507e;
-  --color-brand-900: #0b3e61;
-  --color-brand-950: #092a40;
-  --color-ink: #12263a;
-  --color-muted: #5a6b7c;
-  --color-line: #e1eaf1;
-  --color-surface: #f5f9fc;
+  --color-brand-700: #0f75bc;
+  --color-brand-800: #0f75bc;
+  --color-brand-900: #0f75bc;
+  --color-brand-950: #0f75bc;
+  --color-ink: #20252b;
+  --color-muted: #667078;
+  --color-line: #e5e8eb;
+  --color-surface: #f7f8f9;
 }
 
 html {

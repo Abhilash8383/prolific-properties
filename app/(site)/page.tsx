@@ -195,9 +195,11 @@ export default async function Home() {
             View all properties <ArrowRight className="size-4" />
           </Link>
         </div>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="-mx-5 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
           {featured.map((p) => (
-            <PropertyCard key={p.slug} p={p} />
+            <div key={p.slug} className="w-[min(82vw,22rem)] shrink-0 snap-start sm:w-auto">
+              <PropertyCard p={p} />
+            </div>
           ))}
         </div>
       </section>
@@ -238,14 +240,14 @@ export default async function Home() {
               <SectionHeading eyebrow="Explore locations" title="Find a home in the right neighbourhood" text="Browse the areas where we currently have homes." />
               <Link href="/properties" className="inline-flex items-center gap-2 font-semibold text-brand-700">All locations <ArrowRight className="size-4" /></Link>
             </div>
-            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="-mx-5 mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-5">
               {areas.map(([area, details]) => (
-                <Link key={area} href={`/properties?q=${encodeURIComponent(area)}`} className="group relative aspect-4/3 overflow-hidden rounded-2xl sm:aspect-3/4 lg:aspect-4/5">
+                <Link key={area} href={`/properties?q=${encodeURIComponent(area)}`} className="group relative aspect-4/3 w-[72vw] max-w-72 shrink-0 snap-start overflow-hidden rounded-2xl sm:aspect-3/4 sm:w-auto sm:max-w-none lg:aspect-4/5">
                   <Image src={details.image} alt="" fill sizes="(min-width:1024px) 20vw, (min-width:640px) 50vw, 100vw" className="object-cover transition duration-500 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-linear-to-t from-brand-950/85 via-brand-950/10 to-transparent" />
                   <div className="absolute inset-x-4 bottom-4 text-white">
                     <h3 className="font-semibold sm:text-lg">{area}</h3>
-                    <p className="mt-0.5 text-xs text-white/80">{details.city} · {details.count} {details.count === 1 ? "home" : "homes"}</p>
+                    <p className="mt-0.5 text-xs text-white">{details.city} · {details.count} {details.count === 1 ? "home" : "homes"}</p>
                   </div>
                 </Link>
               ))}
@@ -397,9 +399,9 @@ export default async function Home() {
           <div className="absolute inset-0 bg-linear-to-r from-brand-950 via-brand-950/90 to-brand-950/50" />
           <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-xl">
-              <p className="text-xs font-semibold tracking-widest text-brand-300 uppercase">Ready when you are</p>
+              <p className="text-xs font-semibold tracking-widest text-white uppercase">Ready when you are</p>
               <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Find a home that feels right.</h2>
-              <p className="mt-3 text-white/75">Explore verified listings or speak with an advisor about your options.</p>
+              <p className="mt-3 text-white">Explore verified listings or speak with an advisor about your options.</p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
               <Link href="/properties" className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 font-semibold text-brand-700 transition hover:bg-brand-50">Explore properties <ArrowRight className="size-4" /></Link>

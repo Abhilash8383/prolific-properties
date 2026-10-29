@@ -49,7 +49,7 @@ export default async function AboutPage() {
           {stats.map((s) => (
             <div key={s.label}>
               <p className="text-3xl font-bold sm:text-4xl">{s.value}</p>
-              <p className="text-brand-100">{s.label}</p>
+              <p className="text-white">{s.label}</p>
             </div>
           ))}
         </div>

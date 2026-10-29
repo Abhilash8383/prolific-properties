@@ -129,7 +129,7 @@ export function AdminNav({ email, newEnquiries, logout }: { email: string; newEn
           href={href}
           onClick={() => setOpen(false)}
           className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-            active(href) ? "bg-white/10 text-white" : "text-brand-100/70 hover:bg-white/5 hover:text-white"
+            active(href) ? "bg-white/10 text-white" : "text-white hover:bg-white/5"
           }`}
         >
           <Icon className="size-4.5" />
@@ -140,13 +140,13 @@ export function AdminNav({ email, newEnquiries, logout }: { email: string; newEn
         </Link>
       ))}
       <div className="mt-auto border-t border-white/10 pt-4">
-        <p className="truncate px-3 text-xs text-brand-100/60">{email}</p>
+        <p className="truncate px-3 text-xs text-white">{email}</p>
         <div className="mt-2 flex gap-1">
-          <Link href="/" target="_blank" className="flex-1 rounded-xl px-3 py-2 text-sm text-brand-100/70 hover:bg-white/5 hover:text-white">
+          <Link href="/" target="_blank" className="flex-1 rounded-xl px-3 py-2 text-sm text-white hover:bg-white/5">
             View site
           </Link>
           <form action={logout}>
-            <button className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-brand-100/70 hover:bg-white/5 hover:text-white">
+            <button className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-white hover:bg-white/5">
               <LogOut className="size-4" /> Log out
             </button>
           </form>

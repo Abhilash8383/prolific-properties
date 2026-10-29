@@ -31,7 +31,7 @@ export default function ServicesPage() {
                   <Icon className="size-7" />
                 </span>
                 <h3 className="relative mt-6 text-xl font-semibold text-ink group-hover:text-white">{s.title}</h3>
-                <p className="relative mt-3 leading-relaxed text-muted group-hover:text-brand-100">{s.text}</p>
+                <p className="relative mt-3 leading-relaxed text-muted group-hover:text-white">{s.text}</p>
               </div>
             );
           })}

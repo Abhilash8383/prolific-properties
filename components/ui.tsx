@@ -29,7 +29,7 @@ export function PageHero({ title, text, image }: { title: string; text: string; 
       <Image src={image} alt="" fill loading="eager" sizes="100vw" className="-z-10 object-cover opacity-30" />
       <div className="absolute inset-0 -z-10 bg-linear-to-r from-brand-950 via-brand-950/80 to-brand-900/30" />
       <div className="container-x py-14 md:py-28">
-        <nav className="flex items-center gap-1 text-sm text-brand-200">
+        <nav className="flex items-center gap-1 text-sm text-white">
           <Link href="/" className="hover:text-white">
             Home
           </Link>
@@ -37,7 +37,7 @@ export function PageHero({ title, text, image }: { title: string; text: string; 
           <span className="text-white">{title}</span>
         </nav>
         <h1 className="mt-4 text-4xl font-bold tracking-tight text-white md:text-6xl">{title}</h1>
-        <p className="mt-4 max-w-xl text-brand-100/80 md:text-lg">{text}</p>
+        <p className="mt-4 max-w-xl text-white md:text-lg">{text}</p>
       </div>
     </section>
   );

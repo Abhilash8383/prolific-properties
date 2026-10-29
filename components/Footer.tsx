@@ -9,7 +9,7 @@ import { getProperties, getSettings } from "@/lib/data";
 export async function Footer() {
   const [site, properties] = await Promise.all([getSettings(), getProperties()]);
   return (
-    <footer className="bg-brand-950 text-white/70">
+    <footer className="bg-brand-950 text-white">
       <div className="container-x grid grid-cols-2 gap-x-6 gap-y-10 py-12 md:py-16 lg:grid-cols-4 lg:gap-12">
         <div className="col-span-2 space-y-5 lg:col-span-1">
           <Logo light />
@@ -45,16 +45,16 @@ export async function Footer() {
           <h3 className="mb-5 text-sm font-semibold tracking-widest text-white uppercase">Contact</h3>
           <ul className="space-y-4 text-sm">
             <li className="flex gap-3">
-              <MapPin className="size-4 shrink-0 text-brand-400" /> {site.address}
+              <MapPin className="size-4 shrink-0 text-white" /> {site.address}
             </li>
             <li>
               <a href={`tel:${site.phone}`} className="flex gap-3 hover:text-white">
-                <Phone className="size-4 text-brand-400" /> {site.phone}
+                <Phone className="size-4 text-white" /> {site.phone}
               </a>
             </li>
             <li>
               <a href={`mailto:${site.email}`} className="flex gap-3 break-all hover:text-white">
-                <Mail className="size-4 text-brand-400" /> {site.email}
+                <Mail className="size-4 text-white" /> {site.email}
               </a>
             </li>
           </ul>
@@ -68,7 +68,7 @@ export async function Footer() {
               .map((p) => (
                 <li key={p.slug}>
                   <Link href={`/properties/${p.slug}`} className="group block">
-                    <span className="block text-sm font-medium text-white group-hover:text-brand-300">{p.title}</span>
+                    <span className="block text-sm font-medium text-white group-hover:underline">{p.title}</span>
                     <span className="text-xs">
                       {formatPrice(p)} onwards · {p.area}
                     </span>
