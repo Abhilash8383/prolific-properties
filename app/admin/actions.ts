@@ -8,6 +8,7 @@ import { collection, imageBucket } from "@/lib/db";
 import { createSession, destroySession, requireAdmin } from "@/lib/auth";
 import { TAGS } from "@/lib/data";
 import { slugify } from "@/lib/format";
+import { MAX_UPLOAD_BYTES, isAcceptedImageType } from "@/lib/upload";
 import { CATEGORIES, ENQUIRY_STATUSES, FEATURE_GROUPS, LISTING_TYPES, PLACEMENTS, STATUSES, type Placement } from "@/lib/types";
 
 export type FormState = { ok?: boolean; error?: string; message?: string } | null;
@@ -32,13 +33,22 @@ const oid = (id: string) => {
 
 async function uploadImages(f: FormData, key: string) {
   const files = f.getAll(key).filter((x): x is File => x instanceof File && x.size > 0);
-  const bucket = await imageBucket();
+  if (files.reduce((size, file) => size + file.size, 0) > MAX_UPLOAD_BYTES) {
+    throw new Error("Photos must total no more than 3.5 MB per save");
+  }
+  for (const file of files) {
+    if (!isAcceptedImageType(file.type)) throw new Error(`${file.name} must be a JPG, PNG or WebP image`);
+  }
+  const bucket = files.length ? await imageBucket() : null;
   const urls: string[] = [];
   for (const file of files) {
-    if (!file.type.startsWith("image/")) throw new Error(`${file.name} is not an image`);
-    if (file.size > 8 * 1024 * 1024) throw new Error(`${file.name} is larger than 8 MB`);
     const data = Buffer.from(await file.arrayBuffer());
-    const upload = bucket.openUploadStream(file.name, { metadata: { contentType: file.type } });
+    const jpeg = data[0] === 0xff && data[1] === 0xd8 && data[2] === 0xff;
+    const png = data.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+    const webp = data.toString("ascii", 0, 4) === "RIFF" && data.toString("ascii", 8, 12) === "WEBP";
+    const valid = file.type === "image/jpeg" ? jpeg : file.type === "image/png" ? png : webp;
+    if (!valid) throw new Error(`${file.name} is not a valid ${file.type.slice(6).toUpperCase()} image`);
+    const upload = bucket!.openUploadStream(file.name, { metadata: { contentType: file.type } });
     await new Promise<void>((resolve, reject) => {
       upload.on("finish", () => resolve());
       upload.on("error", reject);

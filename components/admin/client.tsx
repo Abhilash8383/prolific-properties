@@ -7,6 +7,7 @@ import { useActionState, useState, useTransition, type ReactNode } from "react";
 import { BriefcaseBusiness, Building2, FileText, Inbox, LayoutDashboard, LogOut, Menu, MessageSquareQuote, Settings, UserCog, X } from "lucide-react";
 import { primaryButton } from "./fields";
 import type { FormState } from "@/app/admin/actions";
+import { MAX_UPLOAD_BYTES, isAcceptedImageType } from "@/lib/upload";
 
 export function AdminForm({
   action,
@@ -20,14 +21,32 @@ export function AdminForm({
   className?: string;
 }) {
   const [state, formAction, pending] = useActionState(action, null);
+  const [uploadError, setUploadError] = useState("");
   return (
-    <form action={formAction} className={className}>
+    <form
+      action={formAction}
+      className={className}
+      onSubmit={(event) => {
+        const files = Array.from(event.currentTarget.querySelectorAll('input[type="file"]'))
+          .flatMap((input) => Array.from(input.files ?? []));
+        if (files.some((file) => !isAcceptedImageType(file.type))) {
+          event.preventDefault();
+          setUploadError("Choose JPG, PNG or WebP images only.");
+        } else if (files.reduce((size, file) => size + file.size, 0) > MAX_UPLOAD_BYTES) {
+          event.preventDefault();
+          setUploadError("Choose photos totalling no more than 3.5 MB per save.");
+        } else {
+          setUploadError("");
+        }
+      }}
+    >
       {children}
       <div className="sticky bottom-0 -mx-1 flex flex-wrap items-center gap-4 bg-surface/90 px-1 py-3 backdrop-blur">
         <button disabled={pending} className={primaryButton}>
           {pending ? "Saving..." : submitLabel}
         </button>
         {state?.error && <p className="text-sm font-medium text-red-600">{state.error}</p>}
+        {uploadError && <p className="text-sm font-medium text-red-600">{uploadError}</p>}
         {state?.message && <p className="text-sm font-medium text-emerald-600">{state.message}</p>}
       </div>
     </form>

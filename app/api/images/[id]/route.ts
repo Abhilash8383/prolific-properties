@@ -16,6 +16,8 @@ export async function GET(_req: Request, ctx: RouteContext<"/api/images/[id]">) 
       "Content-Type": String(file.metadata?.contentType ?? "application/octet-stream"),
       "Content-Length": String(file.length),
       "Cache-Control": "public, max-age=31536000, immutable",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "sandbox",
     },
   });
 }

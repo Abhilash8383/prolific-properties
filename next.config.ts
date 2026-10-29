@@ -4,8 +4,8 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   experimental: {
-    serverActions: { bodySizeLimit: "20mb" },
-    proxyClientMaxBodySize: "20mb",
+    serverActions: { bodySizeLimit: "4mb" },
+    proxyClientMaxBodySize: "4mb",
   },
   images: {
     remotePatterns: [new URL("https://images.unsplash.com/**")],
