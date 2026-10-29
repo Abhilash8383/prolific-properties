@@ -8,7 +8,6 @@ import {
   House,
   KeyRound,
   Landmark,
-  MapPin,
   MapPinned,
   MessagesSquare,
   PanelsTopLeft,
@@ -19,6 +18,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { PropertyCard } from "@/components/PropertyCard";
+import { HeroCarousel } from "@/components/HeroCarousel";
 import { PostCard } from "@/components/PostCard";
 import { SectionHeading } from "@/components/ui";
 import { budgets, formatPrice } from "@/lib/format";
@@ -54,8 +54,13 @@ export default async function Home() {
   ]);
   const placed = properties.filter((p) => p.placements.includes("homeFeatured"));
   const featured = (placed.length ? placed : properties).slice(0, 3);
-  const spotlight = properties.find((p) => p.placements.includes("spotlight")) ?? properties[0];
-  const spotlightImage = spotlight?.images[0] || img("1600596542815-ffad4c1539a9");
+  const heroProperties = [
+    ...properties.filter((p) => p.placements.includes("spotlight")),
+    ...properties.filter((p) => p.placements.includes("homeFeatured") && !p.placements.includes("spotlight")),
+  ];
+  if (!heroProperties.length) heroProperties.push(...properties.slice(0, 3));
+  const fallbackImage = img("1600596542815-ffad4c1539a9");
+  const spotlightImage = heroProperties[0]?.images[0] || fallbackImage;
   const areaMap = new Map<string, { count: number; image: string; city: string }>();
   for (const property of properties) {
     if (!property.area) continue;
@@ -111,37 +116,17 @@ export default async function Home() {
               ))}
             </div>
           </div>
-          <div className="relative">
-            <div className="relative aspect-4/3 overflow-hidden rounded-[2rem] shadow-2xl shadow-brand-950/10 lg:aspect-5/4">
-              <Image
-                src={spotlightImage}
-                alt={spotlight ? spotlight.title : "Featured home"}
-                fill
-                loading="eager"
-                sizes="(min-width:1024px) 50vw, 100vw"
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-brand-950/40 via-transparent to-transparent" />
-            </div>
-            {properties.length > 0 && (
-              <span className="absolute top-4 right-4 rounded-full bg-white/95 px-4 py-2 text-sm font-semibold text-brand-700 shadow-lg">
-                {properties.length} homes to explore
-              </span>
-            )}
-            {spotlight && (
-              <Link
-                href={`/properties/${spotlight.slug}`}
-                className="absolute right-4 bottom-4 left-4 flex items-center justify-between gap-3 rounded-2xl bg-white/95 p-3 shadow-xl backdrop-blur sm:right-6 sm:bottom-6 sm:left-auto sm:min-w-72 sm:p-4"
-              >
-                <div>
-                  <p className="text-xs font-semibold text-brand-600">Featured home</p>
-                  <p className="mt-1 font-semibold text-ink">{spotlight.title}</p>
-                  <p className="mt-1 flex items-center gap-1 text-xs text-muted"><MapPin className="size-3" /> {spotlight.area} · {formatPrice(spotlight)}</p>
-                </div>
-                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-brand-600 text-white"><ArrowRight className="size-4" /></span>
-              </Link>
-            )}
-          </div>
+          <HeroCarousel
+            slides={heroProperties.map((property) => ({
+              slug: property.slug,
+              title: property.title,
+              area: property.area,
+              price: formatPrice(property),
+              image: property.images[0] || fallbackImage,
+            }))}
+            fallbackImage={fallbackImage}
+            propertyCount={properties.length}
+          />
         </div>
       </section>
 
