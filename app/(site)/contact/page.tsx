@@ -18,7 +18,7 @@ export default async function ContactPage() {
   ];
   return (
     <>
-      <PageHero title="Contact Us" text="Buying, selling or listing a property? We'd love to hear from you." image={img("1600585154340-be6161a56a0c")} />
+      <PageHero title="Contact Us" text="Have a question about a home? Our property advisors are here to help." image={img("1600585154340-be6161a56a0c")} />
 
       <section className="container-x grid gap-8 py-12 md:py-24 lg:grid-cols-2 lg:gap-10">
         <div className="min-w-0">
@@ -64,7 +64,7 @@ export default async function ContactPage() {
               { name: "Full name", required: true },
               { name: "Mobile", type: "tel", required: true },
               { name: "Email", type: "email", required: true },
-              { name: "I want to", options: ["Buy a property", "Sell / list my property", "Rent a property", "Investment advice", "Something else"] },
+              { name: "I want to", options: ["Buy a property", "Rent a property", "Investment advice", "Something else"] },
               { name: "Message", textarea: true },
             ]}
           />

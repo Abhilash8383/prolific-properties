@@ -29,20 +29,20 @@ export function Header({ phone }: { phone: string }) {
             </Link>
           ))}
         </nav>
-        <div className="hidden items-center gap-3 lg:flex">
-          <a href={`tel:${phone}`} className="hidden items-center gap-2 text-sm font-semibold text-ink xl:flex">
-            <Phone className="size-4 text-brand-600" /> {phone}
+        <a
+          href={`tel:${phone}`}
+          className="hidden items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700 lg:inline-flex"
+        >
+          <Phone className="size-4" /> {phone}
+        </a>
+        <div className="flex items-center gap-1 lg:hidden">
+          <a href={`tel:${phone}`} className="rounded-lg p-2 text-brand-700" aria-label={`Call ${phone}`}>
+            <Phone className="size-5" />
           </a>
-          <Link
-            href="/contact"
-            className="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 transition hover:bg-brand-700"
-          >
-            List your property
-          </Link>
+          <button className="rounded-lg p-2" onClick={() => setOpen(!open)} aria-label="Toggle menu">
+            {open ? <X /> : <Menu />}
+          </button>
         </div>
-        <button className="rounded-lg p-2 lg:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu">
-          {open ? <X /> : <Menu />}
-        </button>
       </div>
       {open && (
         <nav className="absolute inset-x-0 top-full max-h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-line bg-white shadow-xl shadow-brand-900/10 lg:hidden">

@@ -23,7 +23,7 @@ export const defaultSettings: Settings = {
   hours: "",
   rera: "",
   social: { facebook: "", instagram: "", linkedin: "", youtube: "" },
-  hero: { title: "Find a home that's", highlight: "truly yours.", subtitle: "" },
+  hero: { title: "Find your perfect property in", highlight: "Bhubaneswar.", subtitle: "Explore verified homes and get guidance from a local property advisor." },
   stats: [],
   developers: [],
   founder: { name: "", title: "", message: "" },

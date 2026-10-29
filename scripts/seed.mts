@@ -410,14 +410,14 @@ const settings = {
   siteName: "Prolific Properties",
   tagline: "Homes worth living for",
   description:
-    "Prolific Properties helps you buy, sell and invest in verified premium homes across Bhubaneswar and Odisha, with expert guidance from first visit to final registration.",
-  phone: "+91-90000-00000",
-  whatsapp: "919000000000",
+    "Explore verified homes across Bhubaneswar and Odisha with clear information and local guidance from Prolific Properties.",
+  phone: "9090090155",
+  whatsapp: "919090090155",
   email: "info@prolificproperties.in",
   hrEmail: "hr@prolificproperties.in",
-  address: "4th Floor, Business Tower, Nayapalli, Bhubaneswar, Odisha - 751015",
+  address: "Saheed Nagar, Bhubaneswar, Odisha",
   hours: "Mon - Sat, 9:30 AM - 7:00 PM",
-  rera: "ORERA Reg. No. XXX/0000/2026",
+  rera: "ORERA - ORA/0333/2026",
   social: {
     facebook: "https://facebook.com/",
     instagram: "https://instagram.com/",
@@ -425,9 +425,9 @@ const settings = {
     youtube: "https://youtube.com/",
   },
   hero: {
-    title: "Find a home that's",
-    highlight: "truly yours.",
-    subtitle: "Your trusted partner for premium apartments, villas and duplexes in Bhubaneswar, hand-picked and verified by our experts.",
+    title: "Find your perfect property in",
+    highlight: "Bhubaneswar.",
+    subtitle: "Explore verified homes, compare your options, and get guidance from a local property advisor.",
   },
   stats: [
     { value: "12+", label: "Years of experience" },
