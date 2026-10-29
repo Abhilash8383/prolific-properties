@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "./Logo";
 import { socials } from "./icons";
-import { nav } from "@/lib/site";
+import { footerNav } from "@/lib/site";
 import { formatPrice } from "@/lib/format";
 import { getProperties, getSettings } from "@/lib/data";
 
@@ -32,7 +32,7 @@ export async function Footer() {
         <div>
           <h3 className="mb-5 text-sm font-semibold tracking-widest text-white uppercase">Quick links</h3>
           <ul className="space-y-3 text-sm">
-            {nav.map((n) => (
+            {footerNav.map((n) => (
               <li key={n.href}>
                 <Link href={n.href} className="hover:text-white">
                   {n.label}

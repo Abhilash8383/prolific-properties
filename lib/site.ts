@@ -1,11 +1,15 @@
-export const nav = [
+export const headerNav = [
   { href: "/", label: "Home" },
   { href: "/properties", label: "Properties" },
   { href: "/services", label: "Services" },
-  { href: "/blog", label: "Blog" },
   { href: "/about", label: "About" },
-  { href: "/career", label: "Career" },
   { href: "/contact", label: "Contact" },
+];
+
+export const footerNav = [
+  ...headerNav,
+  { href: "/blog", label: "Blog" },
+  { href: "/career", label: "Career" },
 ];
 
 export function whatsappLink(number: string, text: string) {
