@@ -91,7 +91,7 @@ export async function login(_prev: FormState, f: FormData): Promise<FormState> {
     await new Promise((r) => setTimeout(r, 500));
     return { error: "Incorrect email or password" };
   }
-  await createSession({ adminId: admin._id.toString(), email });
+  await createSession({ adminId: admin._id.toString(), email, version: Number(admin.sessionVersion ?? 0) });
   redirect("/admin");
 }
 
@@ -116,9 +116,12 @@ export async function updateAccount(_prev: FormState, f: FormData): Promise<Form
 
   await admins.updateOne(
     { _id: admin._id },
-    { $set: { email, name: str(f, "name", 100) || "Admin", ...(password && { passwordHash: await bcrypt.hash(password, 12) }) } },
+    {
+      $set: { email, name: str(f, "name", 100) || "Admin", ...(password && { passwordHash: await bcrypt.hash(password, 12) }) },
+      ...(password && { $inc: { sessionVersion: 1 } }),
+    },
   );
-  await createSession({ adminId: session.adminId, email });
+  await createSession({ adminId: session.adminId, email, version: session.version + (password ? 1 : 0) });
   return { ok: true, message: "Account updated" };
 }
 

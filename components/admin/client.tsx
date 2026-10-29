@@ -27,7 +27,7 @@ export function AdminForm({
       action={formAction}
       className={className}
       onSubmit={(event) => {
-        const files = Array.from(event.currentTarget.querySelectorAll('input[type="file"]'))
+        const files = Array.from(event.currentTarget.querySelectorAll<HTMLInputElement>('input[type="file"]'))
           .flatMap((input) => Array.from(input.files ?? []));
         if (files.some((file) => !isAcceptedImageType(file.type))) {
           event.preventDefault();

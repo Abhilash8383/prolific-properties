@@ -2,6 +2,9 @@ import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { jwtVerify, SignJWT } from "jose";
+import { ObjectId } from "mongodb";
+import { cache } from "react";
+import { collection } from "./db";
 
 export const SESSION_COOKIE = "pp_session";
 const MAX_AGE = 60 * 60 * 24 * 7;
@@ -12,7 +15,7 @@ function secret() {
   return new TextEncoder().encode(s);
 }
 
-export type Session = { adminId: string; email: string };
+export type Session = { adminId: string; email: string; version: number };
 
 export async function createSession(session: Session) {
   const token = await new SignJWT(session)
@@ -37,7 +40,8 @@ export async function verifyToken(token: string | undefined): Promise<Session | 
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, secret());
-    return { adminId: String(payload.adminId), email: String(payload.email) };
+    if (typeof payload.adminId !== "string" || typeof payload.email !== "string") return null;
+    return { adminId: payload.adminId, email: payload.email, version: Number(payload.version ?? 0) };
   } catch {
     return null;
   }
@@ -48,8 +52,13 @@ export async function getSession() {
 }
 
 // Every admin page and server action must call this; the proxy check alone is not enough.
-export async function requireAdmin() {
+export const requireAdmin = cache(async () => {
   const session = await getSession();
-  if (!session) redirect("/admin/login");
+  if (!session || !ObjectId.isValid(session.adminId)) redirect("/admin/login");
+  const admin = await (await collection("admins")).findOne(
+    { _id: new ObjectId(session.adminId) },
+    { projection: { sessionVersion: 1 } },
+  );
+  if (!admin || Number(admin.sessionVersion ?? 0) !== session.version) redirect("/admin/login");
   return session;
-}
+});
