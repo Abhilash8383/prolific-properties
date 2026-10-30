@@ -1,7 +1,8 @@
 import { AdminForm } from "./client";
+import { VariantEditor } from "./VariantEditor";
 import { Checkbox, Input, Panel, Select, Textarea } from "./fields";
 import { saveProperty } from "@/app/admin/actions";
-import { CATEGORIES, FEATURE_GROUPS, LISTING_TYPES, PLACEMENTS, STATUSES, type Placement, type Property } from "@/lib/types";
+import { CATEGORIES, LISTING_TYPES, PLACEMENTS, type Placement, type Property } from "@/lib/types";
 
 export function PropertyForm({ p }: { p?: Property }) {
   return (
@@ -33,34 +34,11 @@ export function PropertyForm({ p }: { p?: Property }) {
             </div>
           </Panel>
 
-          <Panel title="Size & specifications">
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <Input label="Bedrooms" name="bedrooms" type="number" min={0} defaultValue={p?.bedrooms ?? 0} />
-              <Input label="Bathrooms" name="bathrooms" type="number" min={0} defaultValue={p?.bathrooms ?? 0} />
-              <Input label="Size (ft²)" name="sqft" type="number" min={0} defaultValue={p?.sqft ?? 0} />
-              <Input label="Parking" name="parking" type="number" min={0} defaultValue={p?.parking ?? 0} />
-            </div>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <Input label="Configurations" name="configurations" defaultValue={p?.configurations} placeholder="e.g. 2 & 3 BHK" />
-              <Input label="Available from" name="availableFrom" defaultValue={p?.availableFrom} placeholder="e.g. March 2027" />
-              <Input label="RERA number" name="rera" defaultValue={p?.rera} />
-            </div>
-            <Textarea
-              label="Floor plans & pricing"
-              name="floorPlans"
-              rows={3}
-              defaultValue={p?.floorPlans.map((f) => `${f.name} | ${f.sqft} | ${f.price}`).join("\n")}
-              hint="One per line: Unit name | size in ft² | price in ₹ (e.g. 3 BHK | 1600 | 15000000)"
-            />
+          <Panel title="Project details">
+            <Input label="RERA number" name="rera" defaultValue={p?.rera} />
           </Panel>
 
-          <Panel title="Features & amenities" text="Comma separated, e.g. Gym, Clubhouse, Swimming Pool">
-            <div className="grid gap-4 sm:grid-cols-2">
-              {FEATURE_GROUPS.map((g) => (
-                <Input key={g} label={g} name={`features.${g}`} defaultValue={p?.features[g]?.join(", ")} />
-              ))}
-            </div>
-          </Panel>
+          <VariantEditor p={p} />
 
           <Panel title="Photos" text="The first image is used as the cover photo.">
             <Input label="Upload new photos to Cloudinary" name="uploads" type="file" accept="image/jpeg,image/png,image/webp" multiple hint="JPG, PNG or WebP, up to 3.5 MB total per save. Added after the existing photos." />
@@ -80,9 +58,6 @@ export function PropertyForm({ p }: { p?: Property }) {
           <Panel title="Listing">
             <Select label="Listing type" name="listingType" options={LISTING_TYPES} defaultValue={p?.listingType} />
             <Select label="Category" name="category" options={CATEGORIES} defaultValue={p?.category} />
-            <Select label="Status" name="status" options={STATUSES} defaultValue={p?.status} />
-            <Input label="Price" name="price" defaultValue={p?.price ?? ""} placeholder="e.g. 19 Lakhs or 1.5 Crores" hint="Starting price or monthly rent. Use a numeric amount, Lakhs, or Crores to keep budget filters and price sorting accurate." required />
-            <Input label="Units available" name="units" type="number" min={0} step={1} defaultValue={p?.units ?? ""} hint="Leave blank if unknown. Enter 0 when no units remain." />
           </Panel>
           <Panel title="Visibility">
             <Checkbox label="Published on website" name="published" defaultChecked={p?.published ?? true} />

@@ -2,8 +2,7 @@
 
 import Image from "next/image";
 import { useActionState, useState, useSyncExternalStore } from "react";
-import { Check, CheckCircle2, ChevronLeft, ChevronRight, Link2, Printer, User, Video } from "lucide-react";
-import { Facebook, WhatsApp } from "./icons";
+import { Check, CheckCircle2, ChevronLeft, ChevronRight, Share2, User, Video } from "lucide-react";
 import { inputClass } from "./ui";
 import { submitEnquiry } from "@/app/(site)/actions";
 
@@ -11,9 +10,9 @@ export function Gallery({ images, title }: { images: string[]; title: string }) 
   const [active, setActive] = useState(0);
   if (!images.length) return <div className="aspect-16/10 rounded-3xl bg-surface" />;
   return (
-    <div className="grid gap-3 md:grid-cols-[1fr_12rem]">
-      <div className="relative aspect-4/3 overflow-hidden rounded-2xl bg-surface sm:aspect-16/10 sm:rounded-3xl">
-        <Image src={images[active]} alt={title} fill loading="eager" sizes="(min-width:1024px) 66vw, 100vw" className="object-cover" />
+    <div className="grid gap-3">
+      <div className="relative h-64 overflow-hidden rounded-2xl bg-surface sm:h-[26rem] sm:rounded-3xl lg:h-[30rem]">
+        <Image src={images[active]} alt={title} fill loading="eager" sizes="(min-width:1280px) 80rem, 100vw" className="object-cover" />
         {images.length > 1 &&
           ([
             [-1, "left-3", ChevronLeft, "Previous photo"],
@@ -32,14 +31,14 @@ export function Gallery({ images, title }: { images: string[]; title: string }) 
           {active + 1} / {images.length}
         </span>
       </div>
-      <div className="no-scrollbar flex gap-2 overflow-x-auto sm:gap-3 md:flex-col md:overflow-y-auto">
+      <div className="no-scrollbar flex gap-2 overflow-x-auto sm:gap-3">
         {images.map((src, i) => (
           <button
             key={`${src}-${i}`}
             aria-label={`View photo ${i + 1} of ${images.length}`}
             aria-pressed={i === active}
             onClick={() => setActive(i)}
-            className={`relative aspect-4/3 w-20 shrink-0 overflow-hidden rounded-xl ring-2 transition sm:w-28 sm:rounded-2xl md:w-full ${
+            className={`relative aspect-4/3 w-20 shrink-0 overflow-hidden rounded-xl ring-2 transition sm:w-28 sm:rounded-2xl ${
               i === active ? "ring-brand-600" : "opacity-70 ring-transparent hover:opacity-100"
             }`}
           >
@@ -53,28 +52,23 @@ export function Gallery({ images, title }: { images: string[]; title: string }) 
 
 export function ShareActions({ title }: { title: string }) {
   const [copied, setCopied] = useState(false);
-  const btn = "grid size-10 place-items-center rounded-full border border-line bg-white text-ink transition hover:border-brand-300 hover:text-brand-700";
   return (
-    <div className="flex gap-2">
-      <button className={btn} aria-label="Share on WhatsApp" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`${title} ${location.href}`)}`)}>
-        <WhatsApp className="size-4" />
-      </button>
-      <button className={btn} aria-label="Share on Facebook" onClick={() => window.open(`https://www.facebook.com/sharer.php?u=${encodeURIComponent(location.href)}`)}>
-        <Facebook className="size-4" />
-      </button>
+    <div>
       <button
-        className={btn}
-        aria-label="Copy link"
-        onClick={() => {
-          navigator.clipboard.writeText(location.href);
-          setCopied(true);
-          setTimeout(() => setCopied(false), 1500);
+        type="button"
+        className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-3 py-2 text-sm font-medium text-ink transition hover:border-brand-300 hover:text-brand-700"
+        onClick={async () => {
+          if (navigator.share) {
+            try { await navigator.share({ title, url: location.href }); } catch { /* Sharing was cancelled. */ }
+          } else {
+            await navigator.clipboard.writeText(location.href);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          }
         }}
       >
-        {copied ? <Check className="size-4 text-brand-600" /> : <Link2 className="size-4" />}
-      </button>
-      <button className={btn} aria-label="Print" onClick={() => print()}>
-        <Printer className="size-4" />
+        {copied ? <Check className="size-4 text-brand-600" /> : <Share2 className="size-4" />}
+        {copied ? "Link copied" : "Share"}
       </button>
     </div>
   );

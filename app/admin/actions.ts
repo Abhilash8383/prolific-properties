@@ -8,10 +8,11 @@ import { redirect } from "next/navigation";
 import { collection } from "@/lib/db";
 import { createSession, destroySession, requireAdmin } from "@/lib/auth";
 import { TAGS } from "@/lib/data";
-import { slugify } from "@/lib/format";
+import { priceToRupees, slugify } from "@/lib/format";
+import { variantPrice } from "@/lib/variants";
 import { MAX_UPLOAD_BYTES, isAcceptedImageType } from "@/lib/upload";
 import { allowRequest } from "@/lib/rate-limit";
-import { CATEGORIES, ENQUIRY_STATUSES, FEATURE_GROUPS, LISTING_TYPES, PLACEMENTS, STATUSES, type Placement } from "@/lib/types";
+import { CATEGORIES, ENQUIRY_STATUSES, FEATURE_GROUPS, LISTING_TYPES, PLACEMENTS, STATUSES, type Placement, type PropertyVariant } from "@/lib/types";
 
 export type FormState = { ok?: boolean; error?: string; message?: string } | null;
 
@@ -150,11 +151,45 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
     const id = str(f, "id") ? oid(str(f, "id")) : undefined;
     const title = str(f, "title", 200);
     if (!title) throw new Error("Title is required");
-    const price = str(f, "price", 100);
-    if (!price) throw new Error("Price is required");
-    const unitsInput = str(f, "units", 20);
-    const units = unitsInput === "" ? null : Number(unitsInput);
-    if (units !== null && (!/^\d+$/.test(unitsInput) || !Number.isSafeInteger(units))) throw new Error("Units available must be a whole number of 0 or more");
+    const variantCount = Number(str(f, "variantCount", 3));
+    if (!Number.isInteger(variantCount) || variantCount < 1 || variantCount > 30) throw new Error("Add between 1 and 30 configurations");
+    const variants: PropertyVariant[] = Array.from({ length: variantCount }, (_, index) => {
+      const key = `variants.${index}`;
+      const name = str(f, `${key}.name`, 100);
+      const price = str(f, `${key}.price`, 100);
+      const basePrice = str(f, `${key}.basePrice`, 100);
+      if (!name) throw new Error(`Configuration ${index + 1} needs a name`);
+      if (!price) throw new Error(`${name} needs a final price`);
+      const unitsInput = str(f, `${key}.units`, 20);
+      const units = unitsInput === "" ? null : Number(unitsInput);
+      if (units !== null && (!/^\d+$/.test(unitsInput) || !Number.isSafeInteger(units))) throw new Error(`${name}: units available must be a whole number of 0 or more`);
+      const sqft = num(f, `${key}.sqft`);
+      const sqftMax = num(f, `${key}.sqftMax`);
+      if (sqftMax < sqft) throw new Error(`${name}: maximum size must be at least the minimum size`);
+      const planCount = Number(str(f, `${key}.planCount`, 3));
+      if (!Number.isInteger(planCount) || planCount < 0 || planCount > 30) throw new Error(`${name}: add no more than 30 floor plans`);
+      const floorPlans = Array.from({ length: planCount }, (_, planIndex) => {
+        const planKey = `${key}.plans.${planIndex}`;
+        const planName = str(f, `${planKey}.name`, 100);
+        const planSqft = num(f, `${planKey}.sqft`);
+        const planPrice = str(f, `${planKey}.price`, 100);
+        if (!planName || !planPrice || !planSqft) throw new Error(`${name}: each floor plan needs a name, size and price`);
+        if (planSqft < sqft || planSqft > sqftMax) throw new Error(`${name}: ${planName} must be within the size range`);
+        return { name: planName, sqft: planSqft, price: planPrice };
+      });
+      return {
+        name, basePrice, price, units,
+        bedrooms: num(f, `${key}.bedrooms`),
+        bathrooms: num(f, `${key}.bathrooms`),
+        sqft, sqftMax, floorPlans,
+        parking: num(f, `${key}.parking`),
+        status: oneOf(str(f, `${key}.status`), STATUSES),
+        availableFrom: str(f, `${key}.availableFrom`, 100),
+        description: str(f, `${key}.description`, 3000),
+        features: Object.fromEntries(FEATURE_GROUPS.map((g) => [g, csv(f, `${key}.features.${g}`)])) as PropertyVariant["features"],
+      };
+    });
+    const primary = variants[0];
     const images = [...lines(f, "images"), ...(await uploadImages(f, "uploads", "properties"))];
     const doc = {
       title,
@@ -162,20 +197,20 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
       developer: str(f, "developer", 200),
       category: oneOf(str(f, "category"), CATEGORIES),
       listingType: oneOf(str(f, "listingType"), LISTING_TYPES),
-      status: oneOf(str(f, "status"), STATUSES),
+      status: primary.status,
       placements: f.getAll("placements").filter((v): v is Placement => typeof v === "string" && v in PLACEMENTS),
       published: f.get("published") === "on",
-      price,
-      units,
-      configurations: str(f, "configurations", 200),
+      price: variantPrice(primary),
+      units: primary.units,
+      configurations: variants.map((v) => v.name).join(", "),
       area: str(f, "area", 200),
       city: str(f, "city", 100) || "Bhubaneswar",
       state: str(f, "state", 100) || "Odisha",
-      bedrooms: num(f, "bedrooms"),
-      bathrooms: num(f, "bathrooms"),
-      sqft: num(f, "sqft"),
-      parking: num(f, "parking"),
-      availableFrom: str(f, "availableFrom", 100),
+      bedrooms: primary.bedrooms,
+      bathrooms: primary.bathrooms,
+      sqft: primary.sqft,
+      parking: primary.parking,
+      availableFrom: primary.availableFrom,
       rera: str(f, "rera", 100),
       summary: str(f, "summary", 500),
       description: str(f, "description", 20000)
@@ -183,11 +218,11 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
         .map((p) => p.trim())
         .filter(Boolean),
       images,
-      features: Object.fromEntries(FEATURE_GROUPS.map((g) => [g, csv(f, `features.${g}`)])),
-      floorPlans: lines(f, "floorPlans").map((l) => {
-        const [name, sqft, price] = l.split("|").map((s) => s.trim());
-        return { name, sqft: Number(sqft?.replace(/\D/g, "")) || 0, price: Number(price?.replace(/\D/g, "")) || 0 };
-      }),
+      features: primary.features,
+      floorPlans: variants.flatMap((v) => v.floorPlans?.length
+        ? v.floorPlans.map((plan) => ({ name: `${v.name} · ${plan.name}`, sqft: plan.sqft, price: priceToRupees(plan.price) ?? 0 }))
+        : [{ name: v.name, sqft: v.sqft, price: priceToRupees(v.price) ?? 0 }]),
+      variants,
       updatedAt: new Date(),
     };
     const col = await collection("properties");

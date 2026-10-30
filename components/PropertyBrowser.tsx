@@ -6,6 +6,7 @@ import { LayoutGrid, List, RotateCcw, Search, SlidersHorizontal, X } from "lucid
 import { PropertyCard } from "./PropertyCard";
 import { inputClass } from "./ui";
 import { budgets, priceToRupees } from "@/lib/format";
+import { variantMaxSqft, variantPrice } from "@/lib/variants";
 import { CATEGORIES, STATUSES, type Property } from "@/lib/types";
 
 const sorts = {
@@ -38,27 +39,30 @@ export function PropertyBrowser({ properties }: { properties: Property[] }) {
 
   const results = properties
     .filter((p) => {
-      const price = priceToRupees(p.price);
+      const variants = p.variants?.length ? p.variants : [p];
       return (
         (!q || [p.title, p.area, p.city, p.developer].some((s) => s.toLowerCase().includes(q))) &&
         (!get("type") || p.listingType === get("type")) &&
         (!get("category") || p.category === get("category")) &&
         (!get("city") || p.city === get("city")) &&
-        (!get("status") || p.status === get("status")) &&
-        (!get("beds") || p.bedrooms >= Number(get("beds"))) &&
-        (!get("budget") || (price !== null && price >= min && (!max || price <= max)))
+        variants.some((v) =>
+          (!get("status") || v.status === get("status")) &&
+          (!get("beds") || v.bedrooms >= Number(get("beds"))) &&
+          (!get("budget") || ((price) => price !== null && price >= min && (!max || price <= max))(priceToRupees(variantPrice(v))))
+        )
       );
     })
     .sort((a, b) => {
       if (sort === "price-asc" || sort === "price-desc") {
-        const aPrice = priceToRupees(a.price);
-        const bPrice = priceToRupees(b.price);
-        if (aPrice === null) return bPrice === null ? 0 : 1;
-        if (bPrice === null) return -1;
+        const lowest = (p: Property) => Math.min(...(p.variants?.length ? p.variants : [p]).map((v) => priceToRupees(variantPrice(v)) ?? Infinity));
+        const aPrice = lowest(a);
+        const bPrice = lowest(b);
+        if (!Number.isFinite(aPrice)) return Number.isFinite(bPrice) ? 1 : 0;
+        if (!Number.isFinite(bPrice)) return -1;
         return sort === "price-asc" ? aPrice - bPrice : bPrice - aPrice;
       }
       return sort === "size-desc"
-        ? b.sqft - a.sqft
+        ? Math.max(...(b.variants?.length ? b.variants : [b]).map(variantMaxSqft)) - Math.max(...(a.variants?.length ? a.variants : [a]).map(variantMaxSqft))
         : Number(b.placements.includes("pinned")) - Number(a.placements.includes("pinned")) || b.createdAt.localeCompare(a.createdAt);
     });
 

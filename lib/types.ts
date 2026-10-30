@@ -15,6 +15,23 @@ export type ListingType = (typeof LISTING_TYPES)[number];
 export type Status = (typeof STATUSES)[number];
 export type FeatureGroup = (typeof FEATURE_GROUPS)[number];
 
+export type PropertyVariant = {
+  name: string;
+  basePrice: string;
+  price: string;
+  units: number | null;
+  bedrooms: number;
+  bathrooms: number;
+  sqft: number;
+  sqftMax?: number;
+  floorPlans?: { name: string; sqft: number; price: string }[];
+  parking: number;
+  status: Status;
+  availableFrom: string;
+  description: string;
+  features: Record<FeatureGroup, string[]>;
+};
+
 export type Property = {
   id: string;
   ref: number;
@@ -43,6 +60,7 @@ export type Property = {
   images: string[];
   features: Record<FeatureGroup, string[]>;
   floorPlans: { name: string; sqft: number; price: number }[];
+  variants?: PropertyVariant[];
   createdAt: string;
   updatedAt: string;
 };
