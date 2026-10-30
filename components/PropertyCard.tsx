@@ -13,6 +13,7 @@ export function PropertyCard({ p, layout = "grid" }: { p: Property; layout?: "gr
   return (
     <Link
       href={`/properties/${p.slug}`}
+      prefetch
       className={`group flex overflow-hidden rounded-2xl border border-line bg-white transition hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-900/10 ${
         list ? "flex-col sm:flex-row" : "flex-col"
       }`}

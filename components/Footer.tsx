@@ -70,7 +70,7 @@ export async function Footer() {
               .slice(0, 3)
               .map((p) => (
                 <li key={p.slug}>
-                  <Link href={`/properties/${p.slug}`} className="group block">
+                  <Link href={`/properties/${p.slug}`} prefetch className="group block">
                     <span className="block text-sm font-medium text-white group-hover:underline">{p.title}</span>
                     <span className="text-xs">
                       {formatPrice(p)} onwards · {p.area}

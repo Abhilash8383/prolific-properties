@@ -15,8 +15,6 @@ import { JsonLd } from "@/components/JsonLd";
 import { absoluteUrl, seoMetadata } from "@/lib/seo";
 import type { Property } from "@/lib/types";
 
-export const instant = false;
-
 export async function generateMetadata({ params }: PageProps<"/properties/[slug]">): Promise<Metadata> {
   const p = await getProperty((await params).slug);
   return p ? seoMetadata({
@@ -61,9 +59,9 @@ function configurationsFor(p: Property): ConfigurationOption[] {
 }
 
 export default async function PropertyPage({ params }: PageProps<"/properties/[slug]">) {
-  const p = await getProperty((await params).slug);
+  const [{ slug }, site, properties] = await Promise.all([params, getSettings(), getProperties()]);
+  const p = properties.find((item) => item.slug === slug);
   if (!p) notFound();
-  const [site, properties] = await Promise.all([getSettings(), getProperties()]);
   const options = configurationsFor(p).sort((a, b) => (priceToRupees(variantPrice(a)) ?? Infinity) - (priceToRupees(variantPrice(b)) ?? Infinity));
   const startingPrice = options.reduce((lowest, option) => {
     const price = variantPrice(option);

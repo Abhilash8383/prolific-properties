@@ -123,6 +123,7 @@ export function HeroCarousel({
       {slide && (
         <Link
           href={`/properties/${slide.slug}`}
+          prefetch
           className="absolute right-4 bottom-4 left-4 flex items-center justify-between gap-3 rounded-2xl bg-white/95 p-3 shadow-xl backdrop-blur sm:right-6 sm:bottom-6 sm:left-auto sm:min-w-72 sm:p-4"
         >
           <div>
