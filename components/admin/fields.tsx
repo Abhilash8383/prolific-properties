@@ -56,13 +56,44 @@ export function Checkbox({ label, ...props }: { label: string } & InputHTMLAttri
   );
 }
 
-export function Panel({ title, text, children }: { title: string; text?: string; children: ReactNode }) {
+export function Panel({
+  step,
+  title,
+  text,
+  children,
+}: {
+  step?: number;
+  title: string;
+  text?: string;
+  children: ReactNode;
+}) {
   return (
     <section className="rounded-2xl border border-line bg-white p-5 md:p-6">
-      <h2 className="font-semibold text-ink">{title}</h2>
-      {text && <p className="mt-1 text-sm text-muted">{text}</p>}
+      <div className="flex items-start gap-3">
+        {step != null && (
+          <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-brand-50 text-xs font-bold text-brand-700">
+            {step}
+          </span>
+        )}
+        <div className="min-w-0">
+          <h2 className="font-semibold text-ink">{title}</h2>
+          {text && <p className="mt-1 text-sm text-muted">{text}</p>}
+        </div>
+      </div>
       <div className="mt-5 grid gap-4">{children}</div>
     </section>
+  );
+}
+
+export function FieldGroup({ title, text, children }: { title: string; text?: string; children: ReactNode }) {
+  return (
+    <div className="rounded-xl border border-line bg-surface/60 p-4">
+      <div className="mb-3">
+        <h3 className="text-sm font-semibold text-ink">{title}</h3>
+        {text && <p className="mt-0.5 text-xs text-muted">{text}</p>}
+      </div>
+      <div className="grid gap-4">{children}</div>
+    </div>
   );
 }
 

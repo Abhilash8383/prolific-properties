@@ -12,7 +12,7 @@ export function Gallery({ images, title }: { images: string[]; title: string }) 
   return (
     <div className="grid gap-3">
       <div className="relative h-64 overflow-hidden rounded-2xl bg-surface sm:h-[26rem] sm:rounded-3xl lg:h-[30rem]">
-        <Image src={images[active]} alt={title} fill loading="eager" sizes="(min-width:1280px) 80rem, 100vw" className="object-cover" />
+        <Image key={images[active]} src={images[active]} alt={title} fill loading="eager" sizes="(min-width:1280px) 80rem, 100vw" className="object-cover reveal-in" />
         {images.length > 1 &&
           ([
             [-1, "left-3", ChevronLeft, "Previous photo"],
