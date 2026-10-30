@@ -20,6 +20,7 @@ export type PropertyVariant = {
   basePrice: string;
   price: string;
   units: number | null;
+  soldOut?: boolean;
   bedrooms: number;
   bathrooms: number;
   sqft: number;

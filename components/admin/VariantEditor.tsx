@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Copy, Plus, Trash2 } from "lucide-react";
-import { FieldGroup, Input, Select, Textarea, secondaryButton } from "./fields";
+import { Checkbox, FieldGroup, Input, Select, Textarea, secondaryButton } from "./fields";
 import { FEATURE_GROUPS, STATUSES, type Property, type PropertyVariant } from "@/lib/types";
 
 type Draft = Omit<PropertyVariant, "features" | "floorPlans"> & {
@@ -17,6 +17,7 @@ function draft(v?: PropertyVariant): Draft {
     basePrice: v?.basePrice ?? "",
     price: v?.price ?? "",
     units: v?.units ?? null,
+    soldOut: v?.soldOut ?? v?.units === 0,
     bedrooms: v?.bedrooms ?? 0,
     bathrooms: v?.bathrooms ?? 0,
     sqft: v?.sqft ?? 0,
@@ -37,6 +38,7 @@ function initial(p?: Property): Row[] {
     basePrice: "",
     price: p.price,
     units: p.units,
+    soldOut: p.units === 0,
     bedrooms: p.bedrooms,
     bathrooms: p.bathrooms,
     sqft: p.sqft,
@@ -279,6 +281,15 @@ export function VariantEditor({ p }: { p?: Property }) {
                     onChange={(e) => change(id, { units: e.target.value === "" ? null : Number(e.target.value) })}
                     hint="Leave blank if you do not know"
                   />
+                </div>
+                <div className="rounded-xl border border-line bg-surface px-4 py-3">
+                  <Checkbox
+                    label="Sold out"
+                    name={`${key}.soldOut`}
+                    checked={Boolean(v.soldOut) || v.units === 0}
+                    onChange={(e) => change(id, { soldOut: e.target.checked, ...(e.target.checked ? {} : v.units === 0 ? { units: null } : {}) })}
+                  />
+                  <p className="mt-1 pl-6.5 text-xs text-muted">Buyers can still find this home type, but it will be marked sold out. Entering 0 units also marks it sold out.</p>
                 </div>
               </FieldGroup>
 

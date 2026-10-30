@@ -6,7 +6,7 @@ import { LayoutGrid, List, RotateCcw, Search, SlidersHorizontal, X } from "lucid
 import { PropertyCard } from "./PropertyCard";
 import { inputClass } from "./ui";
 import { budgets, priceToRupees } from "@/lib/format";
-import { variantMaxSqft, variantPrice } from "@/lib/variants";
+import { isSoldOut, variantMaxSqft, variantPrice } from "@/lib/variants";
 import { CATEGORIES, STATUSES, type Property } from "@/lib/types";
 
 const sorts = {
@@ -54,7 +54,11 @@ export function PropertyBrowser({ properties }: { properties: Property[] }) {
     })
     .sort((a, b) => {
       if (sort === "price-asc" || sort === "price-desc") {
-        const lowest = (p: Property) => Math.min(...(p.variants?.length ? p.variants : [p]).map((v) => priceToRupees(variantPrice(v)) ?? Infinity));
+        const lowest = (p: Property) => {
+          const variants = p.variants?.length ? p.variants : [p];
+          const available = variants.filter((v) => !isSoldOut(v));
+          return Math.min(...(available.length ? available : variants).map((v) => priceToRupees(variantPrice(v)) ?? Infinity));
+        };
         const aPrice = lowest(a);
         const bPrice = lowest(b);
         if (!Number.isFinite(aPrice)) return Number.isFinite(bPrice) ? 1 : 0;

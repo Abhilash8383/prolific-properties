@@ -8,7 +8,7 @@ import { PropertyCard } from "@/components/PropertyCard";
 import { Gallery, ScheduleTour, ShareActions } from "@/components/PropertyInteractive";
 import { WhatsApp } from "@/components/icons";
 import { formatPrice, priceToRupees } from "@/lib/format";
-import { configurationLabel, variantPrice } from "@/lib/variants";
+import { configurationLabel, isSoldOut, variantPrice } from "@/lib/variants";
 import { getProperties, getProperty, getSettings } from "@/lib/data";
 import { whatsappLink } from "@/lib/site";
 import { JsonLd } from "@/components/JsonLd";
@@ -42,6 +42,7 @@ function configurationsFor(p: Property): ConfigurationOption[] {
     sqftMax: plan.sqft,
     floorPlans: [],
     bedrooms: Number(plan.name.match(/\b(\d+)\s*BHK\b/i)?.[1]) || undefined,
+    soldOut: p.units === 0,
     status: p.status,
     availableFrom: p.availableFrom,
     description: "",
@@ -58,6 +59,7 @@ function configurationsFor(p: Property): ConfigurationOption[] {
     bathrooms: p.bathrooms,
     parking: p.parking,
     units: p.units,
+    soldOut: p.units === 0,
     status: p.status,
     availableFrom: p.availableFrom,
     description: "",
@@ -69,8 +71,11 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[s
   const [{ slug }, site, properties] = await Promise.all([params, getSettings(), getProperties()]);
   const p = properties.find((item) => item.slug === slug);
   if (!p) notFound();
-  const options = configurationsFor(p).sort((a, b) => (priceToRupees(variantPrice(a)) ?? Infinity) - (priceToRupees(variantPrice(b)) ?? Infinity));
-  const startingPrice = options.reduce((lowest, option) => {
+  const options = configurationsFor(p).sort((a, b) => Number(isSoldOut(a)) - Number(isSoldOut(b)) || (priceToRupees(variantPrice(a)) ?? Infinity) - (priceToRupees(variantPrice(b)) ?? Infinity));
+  const availableOptions = options.filter((option) => !isSoldOut(option));
+  const allSoldOut = availableOptions.length === 0;
+  const someSoldOut = !allSoldOut && availableOptions.length < options.length;
+  const startingPrice = (availableOptions.length ? availableOptions : options).reduce((lowest, option) => {
     const price = variantPrice(option);
     return (priceToRupees(price) ?? Infinity) < (priceToRupees(lowest) ?? Infinity) ? price : lowest;
   }, variantPrice(options[0]));
@@ -78,7 +83,7 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[s
   const address = [p.area, p.city, p.state, "India"].filter(Boolean).join(", ");
   const similar = properties.filter((x) => x.slug !== p.slug && (x.category === p.category || x.city === p.city)).slice(0, 3);
   const statuses = new Set(options.map((option) => option.status));
-  const availability = typeof p.units !== "number" ? undefined : p.units > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock";
+  const availability = allSoldOut ? "https://schema.org/OutOfStock" : availableOptions.some((option) => typeof option.units === "number" && option.units > 0) ? "https://schema.org/InStock" : undefined;
 
   return (
     <div className="bg-surface pb-28 lg:pb-20">
@@ -124,12 +129,13 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[s
         <div className="mt-6 flex flex-wrap items-end justify-between gap-5">
           <div className="min-w-0">
             <p className="text-xs font-semibold tracking-widest text-brand-700 uppercase">{p.category} · For {p.listingType}{statuses.size === 1 ? ` · ${options[0].status}` : ""}</p>
+            {(allSoldOut || someSoldOut) && <span className="mt-3 inline-flex rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">{allSoldOut ? "Sold out" : "Some home types sold out"}</span>}
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-ink md:text-5xl">{p.title}</h1>
             <p className="mt-3 flex items-center gap-1.5 text-sm text-muted md:text-base"><MapPin className="size-4 shrink-0 text-brand-600" /> {[p.area, p.city].filter(Boolean).join(", ")}</p>
           </div>
           <div className="flex w-full items-end justify-between gap-4 sm:w-auto sm:flex-col sm:items-end">
             <div className="sm:text-right">
-              <p className="text-xs font-medium text-muted">{p.listingType === "Rent" ? "Rent from" : "Homes from"}</p>
+              <p className="text-xs font-medium text-muted">{allSoldOut ? "Last listed price" : p.listingType === "Rent" ? "Rent from" : "Homes from"}</p>
               <p className="mt-1 text-2xl font-bold text-brand-700 md:text-3xl">{formatPrice({ price: startingPrice, listingType: p.listingType })}</p>
             </div>
             <ShareActions title={p.title} />
@@ -195,7 +201,7 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[s
 
           <aside id="enquire" className="scroll-mt-24 rounded-3xl border border-line bg-white p-5 lg:sticky lg:top-28 lg:p-6">
             <h2 className="text-lg font-semibold text-ink">Interested in this property?</h2>
-            <p className="mt-1 text-sm text-muted">Ask for availability, a quote or a site visit.</p>
+            <p className="mt-1 text-sm text-muted">{allSoldOut ? "Ask about future availability or similar homes." : "Ask for availability, a quote or a site visit."}</p>
             <div className="mt-5 grid grid-cols-2 gap-2">
               <a href={`tel:${site.phone}`} className="flex items-center justify-center gap-2 rounded-xl border border-line py-3 text-sm font-semibold text-ink transition hover:border-brand-300"><Phone className="size-4" /> Call</a>
               <a href={whatsappLink(site.whatsapp, `I'm interested in ${p.title}`)} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3 text-sm font-semibold text-white transition hover:brightness-95"><WhatsApp className="size-4" /> WhatsApp</a>

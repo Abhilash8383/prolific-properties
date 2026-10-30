@@ -28,10 +28,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { formatPrice } from "@/lib/format";
-import { variantPrice, variantSize } from "@/lib/variants";
+import { isSoldOut, variantPrice, variantSize } from "@/lib/variants";
 import type { FeatureGroup, ListingType, PropertyVariant, Status } from "@/lib/types";
 
-export type ConfigurationOption = Pick<PropertyVariant, "name" | "price" | "basePrice" | "sqft" | "sqftMax" | "floorPlans" | "features" | "description"> & {
+export type ConfigurationOption = Pick<PropertyVariant, "name" | "price" | "basePrice" | "sqft" | "sqftMax" | "floorPlans" | "features" | "description" | "soldOut"> & {
   bedrooms?: number;
   bathrooms?: number;
   parking?: number;
@@ -72,6 +72,7 @@ export function ConfigurationExplorer({ options, listingType }: { options: Confi
   const [selected, setSelected] = useState(0);
   const option = options[selected];
   if (!option) return null;
+  const soldOut = isSoldOut(option);
 
   const facts = [
     { Icon: Ruler, text: variantSize(option) },
@@ -88,7 +89,7 @@ export function ConfigurationExplorer({ options, listingType }: { options: Confi
     <section id="homes" className="scroll-mt-28 rounded-3xl border border-line bg-white p-5 md:p-7">
       <div>
         <p className="text-xs font-semibold tracking-widest text-brand-700 uppercase">Homes & prices</p>
-        <h2 className="mt-2 text-2xl font-bold text-ink">{multi ? "Available homes" : option.name}</h2>
+        <h2 className="mt-2 text-2xl font-bold text-ink">{multi ? "Home types" : option.name}</h2>
         {multi && <p className="mt-1 text-sm text-muted">Pick a home type to see size, price and amenities.</p>}
       </div>
 
@@ -120,7 +121,7 @@ export function ConfigurationExplorer({ options, listingType }: { options: Confi
               >
                 <span className={`block text-sm ${active ? "font-semibold text-brand-700" : "font-medium text-ink"}`}>{item.name}</span>
                 <span className={`mt-0.5 block text-xs ${active ? "text-brand-700/80" : "text-muted"}`}>
-                  {formatPrice({ price: variantPrice(item), listingType })}
+                  {isSoldOut(item) ? "Sold out" : formatPrice({ price: variantPrice(item), listingType })}
                 </span>
               </button>
             );
@@ -139,9 +140,10 @@ export function ConfigurationExplorer({ options, listingType }: { options: Confi
           <div>
             {multi && <h3 className="text-xl font-bold text-ink">{option.name}</h3>}
             <p className={`${multi ? "mt-1" : ""} text-sm text-muted`}>{option.status}</p>
+            {soldOut && <span className="mt-2 inline-flex rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">Sold out</span>}
           </div>
           <div className="sm:text-right">
-            <p className="text-xs font-medium text-muted">{listingType === "Rent" ? "Rent from" : "Price from"}</p>
+            <p className="text-xs font-medium text-muted">{soldOut ? "Last listed price" : listingType === "Rent" ? "Rent from" : "Price from"}</p>
             <p className="mt-1 text-2xl font-bold text-brand-700">{formatPrice({ price: variantPrice(option), listingType })}</p>
             {option.basePrice && (
               <p className="mt-1 text-xs text-muted">Base rate: {formatPrice({ price: option.basePrice, listingType })}</p>

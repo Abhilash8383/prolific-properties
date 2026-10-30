@@ -1,6 +1,10 @@
 import { priceToRupees } from "./format";
 type Option = { price: string; sqft: number; sqftMax?: number; floorPlans?: { sqft: number; price: string | number }[] };
 
+export function isSoldOut(v: { soldOut?: boolean; units?: number | null }): boolean {
+  return v.soldOut === true || v.units === 0;
+}
+
 export function variantPrice(v: Option): string {
   const prices = [v.price, ...(v.floorPlans ?? []).map((plan) => String(plan.price))].filter((price) => priceToRupees(price) !== null);
   return prices.reduce((lowest, price) => (priceToRupees(price) ?? Infinity) < (priceToRupees(lowest) ?? Infinity) ? price : lowest, v.price);

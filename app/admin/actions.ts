@@ -190,7 +190,7 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
         return { name: planName, sqft: planSqft, price: planPrice };
       });
       return {
-        name, basePrice, price, units,
+        name, basePrice, price, units, soldOut: f.get(`${key}.soldOut`) === "on" || units === 0,
         bedrooms: num(f, `${key}.bedrooms`),
         bathrooms: num(f, `${key}.bathrooms`),
         sqft, sqftMax, floorPlans,

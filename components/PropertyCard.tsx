@@ -2,13 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Bath, BedDouble, Building2, MapPin, Ruler } from "lucide-react";
 import { formatPrice, priceToRupees } from "@/lib/format";
-import { variantPrice, variantSize } from "@/lib/variants";
+import { isSoldOut, variantPrice, variantSize } from "@/lib/variants";
 import type { Property } from "@/lib/types";
 
 export function PropertyCard({ p, layout = "grid" }: { p: Property; layout?: "grid" | "list" }) {
   const list = layout === "list";
   const variants = p.variants?.length ? p.variants : [p];
-  const lowest = variants.reduce((best, v) => (priceToRupees(variantPrice(v)) ?? Infinity) < (priceToRupees(variantPrice(best)) ?? Infinity) ? v : best, variants[0]);
+  const available = variants.filter((v) => !isSoldOut(v));
+  const allSoldOut = available.length === 0;
+  const someSoldOut = !allSoldOut && available.length < variants.length;
+  const priced = available.length ? available : variants;
+  const lowest = priced.reduce((best, v) => (priceToRupees(variantPrice(v)) ?? Infinity) < (priceToRupees(variantPrice(best)) ?? Infinity) ? v : best, priced[0]);
   const statuses = new Set(variants.map((v) => v.status));
   return (
     <Link
@@ -28,7 +32,10 @@ export function PropertyCard({ p, layout = "grid" }: { p: Property; layout?: "gr
           className="object-cover transition duration-500 group-hover:scale-105"
         />
         )}
-        <span className="absolute top-3 left-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-ink">{statuses.size > 1 ? "Multiple statuses" : p.status}</span>
+        <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5">
+          <span className="rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-ink">{statuses.size > 1 ? "Multiple statuses" : p.status}</span>
+          {(allSoldOut || someSoldOut) && <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white">{allSoldOut ? "Sold out" : "Some homes sold out"}</span>}
+        </div>
         {(p.placements.includes("homeFeatured") || p.placements.includes("pinned")) && (
           <span className="absolute top-3 right-3 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white">Featured</span>
         )}
@@ -56,11 +63,11 @@ export function PropertyCard({ p, layout = "grid" }: { p: Property; layout?: "gr
           <span className="flex items-center gap-1.5">
             <Ruler className="size-4 text-brand-600" /> {variantSize(lowest)}
           </span>
-          {typeof lowest.units === "number" && <span className="flex items-center gap-1.5"><Building2 className="size-4 text-brand-600" /> {lowest.units} {lowest.units === 1 ? "unit" : "units"} available</span>}
+          {!allSoldOut && typeof lowest.units === "number" && <span className="flex items-center gap-1.5"><Building2 className="size-4 text-brand-600" /> {lowest.units} {lowest.units === 1 ? "unit" : "units"} available</span>}
         </div>
         <div className="mt-auto flex items-end justify-between pt-5">
           <div>
-            <p className="text-xs text-muted">{p.listingType === "Rent" ? "Rent" : "Starting from"}</p>
+            <p className="text-xs text-muted">{allSoldOut ? "Last listed price" : p.listingType === "Rent" ? "Rent" : "Starting from"}</p>
             <p className="text-xl font-bold text-ink">{formatPrice({ price: variantPrice(lowest), listingType: p.listingType })}</p>
           </div>
           <span className="grid size-10 place-items-center rounded-full bg-brand-50 text-brand-700 transition group-hover:bg-brand-600 group-hover:text-white">
