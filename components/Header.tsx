@@ -2,13 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Menu, Phone, X } from "lucide-react";
 import { Logo } from "./Logo";
 import { headerNav } from "@/lib/site";
 
-export function Header({ phone }: { phone: string }) {
-  const pathname = usePathname();
+function HeaderChrome({
+  phone,
+  pathname = "",
+}: {
+  phone: string;
+  pathname?: string;
+}) {
   const [open, setOpen] = useState(false);
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
@@ -64,5 +69,17 @@ export function Header({ phone }: { phone: string }) {
         </nav>
       )}
     </header>
+  );
+}
+
+function HeaderNav({ phone }: { phone: string }) {
+  return <HeaderChrome phone={phone} pathname={usePathname()} />;
+}
+
+export function Header({ phone }: { phone: string }) {
+  return (
+    <Suspense fallback={<HeaderChrome phone={phone} />}>
+      <HeaderNav phone={phone} />
+    </Suspense>
   );
 }
