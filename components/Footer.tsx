@@ -12,7 +12,10 @@ export async function Footer() {
     <footer className="bg-brand-950 text-white">
       <div className="container-x grid grid-cols-2 gap-x-6 gap-y-10 py-12 md:py-16 lg:grid-cols-4 lg:gap-12">
         <div className="col-span-2 space-y-5 lg:col-span-1">
-          <Logo light />
+          <div className="space-y-2">
+            <Logo light />
+            <p className="text-xs text-white/80">A Unit of Prolific Ideas Consulting Services</p>
+          </div>
           <p className="text-sm leading-relaxed">{site.description}</p>
           <div className="flex gap-2">
             {socials.filter(({ key }) => site.social[key]).map(({ key, label, Icon }) => (
