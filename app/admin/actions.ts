@@ -1,10 +1,11 @@
 "use server";
 
 import bcrypt from "bcryptjs";
+import { v2 as cloudinary } from "cloudinary";
 import { ObjectId } from "mongodb";
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { collection, imageBucket } from "@/lib/db";
+import { collection } from "@/lib/db";
 import { createSession, destroySession, requireAdmin } from "@/lib/auth";
 import { TAGS } from "@/lib/data";
 import { slugify } from "@/lib/format";
@@ -50,19 +51,28 @@ async function uploadImages(f: FormData, key: string) {
     const webp = data.toString("ascii", 0, 4) === "RIFF" && data.toString("ascii", 8, 12) === "WEBP";
     const valid = file.type === "image/jpeg" ? jpeg : file.type === "image/png" ? png : webp;
     if (!valid) throw new Error(`${file.name} is not a valid ${file.type.slice(6).toUpperCase()} image`);
-    return { file, data };
+    return data;
   }));
   if (!validated.length) return [];
-  const bucket = await imageBucket();
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  if (!cloudName || !apiKey || !apiSecret) throw new Error("Cloudinary credentials are not configured");
+  cloudinary.config({ cloud_name: cloudName, api_key: apiKey, api_secret: apiSecret, secure: true });
   const urls: string[] = [];
-  for (const { file, data } of validated) {
-    const upload = bucket.openUploadStream(file.name, { metadata: { contentType: file.type } });
-    await new Promise<void>((resolve, reject) => {
-      upload.on("finish", () => resolve());
-      upload.on("error", reject);
-      upload.end(data);
+  for (const data of validated) {
+    const url = await new Promise<string>((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "prolific-properties", resource_type: "image" },
+        (error, result) => {
+          if (error) reject(error);
+          else if (result?.secure_url) resolve(result.secure_url);
+          else reject(new Error("Cloudinary did not return an image URL"));
+        },
+      );
+      stream.end(data);
     });
-    urls.push(`/api/images/${upload.id.toString()}`);
+    urls.push(url);
   }
   return urls;
 }

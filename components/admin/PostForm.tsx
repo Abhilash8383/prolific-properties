@@ -31,8 +31,8 @@ export function PostForm({ post }: { post?: Post }) {
             <Input label="Author" name="author" defaultValue={post?.author ?? "Prolific Properties Team"} />
           </Panel>
           <Panel title="Cover image">
-            <Input label="Image URL" name="coverImage" defaultValue={post?.coverImage} />
-            <Input label="Or upload" name="coverUpload" type="file" accept="image/jpeg,image/png,image/webp" hint="JPG, PNG or WebP up to 3.5 MB. Uploading replaces the URL above." />
+            <Input label="Upload to Cloudinary" name="coverUpload" type="file" accept="image/jpeg,image/png,image/webp" hint="JPG, PNG or WebP up to 3.5 MB. Replaces the existing cover image." />
+            {post && <Input label="Existing image URL" name="coverImage" defaultValue={post.coverImage} />}
           </Panel>
         </div>
       </div>

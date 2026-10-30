@@ -8,7 +8,12 @@ const nextConfig: NextConfig = {
     proxyClientMaxBodySize: "4mb",
   },
   images: {
-    remotePatterns: [new URL("https://images.unsplash.com/**")],
+    remotePatterns: [
+      new URL("https://images.unsplash.com/**"),
+      ...(process.env.CLOUDINARY_CLOUD_NAME
+        ? [new URL(`https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/**`)]
+        : []),
+    ],
     qualities: [75],
   },
   turbopack: {

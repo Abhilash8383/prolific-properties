@@ -15,6 +15,7 @@
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.11.0",
     "jose": "^6.2.12",
     "lucide-react": "^1.57.0",
     "mongodb": "^7.7.0",

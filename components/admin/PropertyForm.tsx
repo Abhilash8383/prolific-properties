@@ -63,14 +63,16 @@ export function PropertyForm({ p }: { p?: Property }) {
           </Panel>
 
           <Panel title="Photos" text="The first image is used as the cover photo.">
-            <Textarea
-              label="Image URLs"
-              name="images"
-              rows={5}
-              defaultValue={p?.images.join("\n")}
-              hint="One per line. Reorder lines to change the order, delete a line to remove a photo."
-            />
-            <Input label="Upload new photos" name="uploads" type="file" accept="image/jpeg,image/png,image/webp" multiple hint="JPG, PNG or WebP, up to 3.5 MB total per save. Added after the existing photos." />
+            <Input label="Upload new photos to Cloudinary" name="uploads" type="file" accept="image/jpeg,image/png,image/webp" multiple hint="JPG, PNG or WebP, up to 3.5 MB total per save. Added after the existing photos." />
+            {p && (
+              <Textarea
+                label="Existing photos"
+                name="images"
+                rows={5}
+                defaultValue={p.images.join("\n")}
+                hint="One URL per line. Reorder lines to change the order, or delete a line to remove a photo."
+              />
+            )}
           </Panel>
         </div>
 
