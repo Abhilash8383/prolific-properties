@@ -254,7 +254,8 @@ const properties = seeds.map((s, i) => ({
   status: s.status,
   placements: !s.featured ? [] : i === 0 ? ["spotlight", "homeFeatured", "footer", "pinned"] : ["homeFeatured", "footer"],
   published: true,
-  price: s.price,
+  price: String(s.price),
+  units: null,
   configurations: s.configurations,
   area: s.area,
   city: s.city ?? "Bhubaneswar",
@@ -458,7 +459,7 @@ const jobs = [
 ];
 
 const client = await new MongoClient(MONGODB_URI).connect();
-const db = client.db();
+const db = client.db("prolific_properties");
 
 for (const [name, docs] of Object.entries({ properties, posts, testimonials, jobs })) {
   await db.collection(name).deleteMany({});

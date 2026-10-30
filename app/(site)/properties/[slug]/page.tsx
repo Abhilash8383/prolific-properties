@@ -6,7 +6,7 @@ import { EnquiryForm } from "@/components/EnquiryForm";
 import { PropertyCard } from "@/components/PropertyCard";
 import { Gallery, ScheduleTour, ShareActions } from "@/components/PropertyInteractive";
 import { WhatsApp } from "@/components/icons";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, priceToRupees } from "@/lib/format";
 import { getProperties, getProperty, getSettings } from "@/lib/data";
 import { whatsappLink } from "@/lib/site";
 import { JsonLd } from "@/components/JsonLd";
@@ -37,12 +37,15 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[s
   const p = await getProperty((await params).slug);
   if (!p) notFound();
   const [site, properties] = await Promise.all([getSettings(), getProperties()]);
+  const priceAmount = priceToRupees(p.price);
+  const availability = typeof p.units !== "number" ? undefined : p.units > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock";
 
   const address = `${p.area}, ${p.city}, ${p.state}, India`;
   const similar = properties.filter((x) => x.slug !== p.slug && (x.category === p.category || x.city === p.city)).slice(0, 3);
   const overview = [
     p.bedrooms > 0 && { Icon: BedDouble, label: "Bedrooms", value: p.bedrooms },
     p.bathrooms > 0 && { Icon: Bath, label: "Bathrooms", value: p.bathrooms },
+    typeof p.units === "number" && { Icon: Building2, label: "Units available", value: p.units },
     { Icon: Ruler, label: "Size", value: `${p.sqft.toLocaleString("en-IN")} ft²` },
     p.parking > 0 && { Icon: Car, label: "Parking", value: `${p.parking} car` },
     { Icon: Building2, label: "Type", value: p.category },
@@ -51,6 +54,7 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[s
   const details = [
     ["Property ID", p.ref],
     ["Price", `${formatPrice(p)}${p.listingType === "Sale" ? " onwards" : ""}`],
+    ["Units available", typeof p.units === "number" ? p.units : "-"],
     ["Configurations", p.configurations],
     ["Property size", `${p.sqft.toLocaleString("en-IN")} ft²`],
     ["Bedrooms", p.bedrooms || "-"],
@@ -85,7 +89,7 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[s
               numberOfBedrooms: p.bedrooms || undefined,
               numberOfBathroomsTotal: p.bathrooms || undefined,
             },
-            offers: { "@type": "Offer", price: p.price, priceCurrency: "INR", availability: "https://schema.org/InStock", seller: { "@id": `${absoluteUrl("/")}#organization` } },
+            offers: priceAmount === null ? undefined : { "@type": "Offer", price: priceAmount, priceCurrency: "INR", availability, seller: { "@id": `${absoluteUrl("/")}#organization` } },
           },
           { "@type": "BreadcrumbList", itemListElement: [
             { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },

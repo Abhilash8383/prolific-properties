@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Bath, BedDouble, MapPin, Ruler } from "lucide-react";
+import { ArrowUpRight, Bath, BedDouble, Building2, MapPin, Ruler } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import type { Property } from "@/lib/types";
 
@@ -51,6 +51,7 @@ export function PropertyCard({ p, layout = "grid" }: { p: Property; layout?: "gr
           <span className="flex items-center gap-1.5">
             <Ruler className="size-4 text-brand-600" /> {p.sqft.toLocaleString("en-IN")} ft²
           </span>
+          {typeof p.units === "number" && <span className="flex items-center gap-1.5"><Building2 className="size-4 text-brand-600" /> {p.units} {p.units === 1 ? "unit" : "units"} available</span>}
         </div>
         <div className="mt-auto flex items-end justify-between pt-5">
           <div>

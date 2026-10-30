@@ -150,6 +150,11 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
     const id = str(f, "id") ? oid(str(f, "id")) : undefined;
     const title = str(f, "title", 200);
     if (!title) throw new Error("Title is required");
+    const price = str(f, "price", 100);
+    if (!price) throw new Error("Price is required");
+    const unitsInput = str(f, "units", 20);
+    const units = unitsInput === "" ? null : Number(unitsInput);
+    if (units !== null && (!/^\d+$/.test(unitsInput) || !Number.isSafeInteger(units))) throw new Error("Units available must be a whole number of 0 or more");
     const images = [...lines(f, "images"), ...(await uploadImages(f, "uploads"))];
     const doc = {
       title,
@@ -160,7 +165,8 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
       status: oneOf(str(f, "status"), STATUSES),
       placements: f.getAll("placements").filter((v): v is Placement => typeof v === "string" && v in PLACEMENTS),
       published: f.get("published") === "on",
-      price: num(f, "price"),
+      price,
+      units,
       configurations: str(f, "configurations", 200),
       area: str(f, "area", 200),
       city: str(f, "city", 100) || "Bhubaneswar",

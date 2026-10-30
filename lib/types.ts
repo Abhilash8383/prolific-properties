@@ -26,7 +26,8 @@ export type Property = {
   status: Status;
   placements: Placement[];
   published: boolean;
-  price: number;
+  price: string;
+  units: number | null;
   configurations: string;
   area: string;
   city: string;

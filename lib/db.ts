@@ -14,7 +14,7 @@ function client() {
 }
 
 export async function db() {
-  return (await client()).db();
+  return (await client()).db("prolific_properties");
 }
 
 export async function collection<T extends Document = Document>(name: string) {

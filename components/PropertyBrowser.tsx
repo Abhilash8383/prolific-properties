@@ -5,7 +5,7 @@ import { useState } from "react";
 import { LayoutGrid, List, RotateCcw, Search, SlidersHorizontal, X } from "lucide-react";
 import { PropertyCard } from "./PropertyCard";
 import { inputClass } from "./ui";
-import { budgets } from "@/lib/format";
+import { budgets, priceToRupees } from "@/lib/format";
 import { CATEGORIES, STATUSES, type Property } from "@/lib/types";
 
 const sorts = {
@@ -37,25 +37,30 @@ export function PropertyBrowser({ properties }: { properties: Property[] }) {
   const sort = (get("sort") || "newest") as keyof typeof sorts;
 
   const results = properties
-    .filter(
-      (p) =>
+    .filter((p) => {
+      const price = priceToRupees(p.price);
+      return (
         (!q || [p.title, p.area, p.city, p.developer].some((s) => s.toLowerCase().includes(q))) &&
         (!get("type") || p.listingType === get("type")) &&
         (!get("category") || p.category === get("category")) &&
         (!get("city") || p.city === get("city")) &&
         (!get("status") || p.status === get("status")) &&
         (!get("beds") || p.bedrooms >= Number(get("beds"))) &&
-        (!get("budget") || (p.price >= min && (!max || p.price <= max))),
-    )
-    .sort((a, b) =>
-      sort === "price-asc"
-        ? a.price - b.price
-        : sort === "price-desc"
-          ? b.price - a.price
-          : sort === "size-desc"
-            ? b.sqft - a.sqft
-            : Number(b.placements.includes("pinned")) - Number(a.placements.includes("pinned")) || b.createdAt.localeCompare(a.createdAt),
-    );
+        (!get("budget") || (price !== null && price >= min && (!max || price <= max)))
+      );
+    })
+    .sort((a, b) => {
+      if (sort === "price-asc" || sort === "price-desc") {
+        const aPrice = priceToRupees(a.price);
+        const bPrice = priceToRupees(b.price);
+        if (aPrice === null) return bPrice === null ? 0 : 1;
+        if (bPrice === null) return -1;
+        return sort === "price-asc" ? aPrice - bPrice : bPrice - aPrice;
+      }
+      return sort === "size-desc"
+        ? b.sqft - a.sqft
+        : Number(b.placements.includes("pinned")) - Number(a.placements.includes("pinned")) || b.createdAt.localeCompare(a.createdAt);
+    });
 
   const select = (k: string, label: string, options: (string | { value: string; label: string })[]) => (
     <label className="grid gap-1.5 text-sm font-medium text-ink">

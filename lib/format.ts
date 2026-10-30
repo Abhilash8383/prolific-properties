@@ -1,7 +1,19 @@
-import type { Property } from "./types";
+import type { ListingType } from "./types";
 
-export function formatPrice(p: Pick<Property, "price" | "listingType">) {
-  const n = p.price;
+export function priceToRupees(price: string | number): number | null {
+  if (typeof price === "number") return Number.isFinite(price) && price >= 0 ? price : null;
+  const match = price.trim().match(/^(?:₹|rs\.?|inr)?\s*([\d,]+(?:\.\d+)?)\s*(lakhs?|lacs?|crores?|cr|l|c)?$/i);
+  if (!match) return null;
+  const amount = Number(match[1].replaceAll(",", ""));
+  const unit = match[2]?.toLowerCase() ?? "";
+  const multiplier = unit.startsWith("c") ? 1e7 : unit.startsWith("l") ? 1e5 : 1;
+  const rupees = amount * multiplier;
+  return Number.isFinite(rupees) && rupees >= 0 ? rupees : null;
+}
+
+export function formatPrice(p: { price: string | number; listingType: ListingType }) {
+  const n = priceToRupees(p.price);
+  if (n === null) return String(p.price).trim();
   const value =
     n >= 1e7
       ? `₹${+(n / 1e7).toFixed(2)} Cr`

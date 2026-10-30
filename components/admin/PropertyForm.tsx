@@ -81,7 +81,8 @@ export function PropertyForm({ p }: { p?: Property }) {
             <Select label="Listing type" name="listingType" options={LISTING_TYPES} defaultValue={p?.listingType} />
             <Select label="Category" name="category" options={CATEGORIES} defaultValue={p?.category} />
             <Select label="Status" name="status" options={STATUSES} defaultValue={p?.status} />
-            <Input label="Price (₹)" name="price" type="number" min={0} defaultValue={p?.price ?? 0} hint="Starting price, or monthly rent for rentals" required />
+            <Input label="Price" name="price" defaultValue={p?.price ?? ""} placeholder="e.g. 19 Lakhs or 1.5 Crores" hint="Starting price or monthly rent. Use a numeric amount, Lakhs, or Crores to keep budget filters and price sorting accurate." required />
+            <Input label="Units available" name="units" type="number" min={0} step={1} defaultValue={p?.units ?? ""} hint="Leave blank if unknown. Enter 0 when no units remain." />
           </Panel>
           <Panel title="Visibility">
             <Checkbox label="Published on website" name="published" defaultChecked={p?.published ?? true} />
