@@ -36,7 +36,7 @@ const oid = (id: string) => {
   return new ObjectId(id);
 };
 
-async function uploadImages(f: FormData, key: string) {
+async function uploadImages(f: FormData, key: string, folder: "properties" | "blog-post") {
   const files = f.getAll(key).filter((x): x is File => x instanceof File && x.size > 0);
   if (files.reduce((size, file) => size + file.size, 0) > MAX_UPLOAD_BYTES) {
     throw new Error("Photos must total no more than 3.5 MB per save");
@@ -63,7 +63,7 @@ async function uploadImages(f: FormData, key: string) {
   for (const data of validated) {
     const url = await new Promise<string>((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
-        { folder: "prolific-properties", resource_type: "image" },
+        { folder: `prolific-properties/${folder}`, resource_type: "image" },
         (error, result) => {
           if (error) reject(error);
           else if (result?.secure_url) resolve(result.secure_url);
@@ -155,7 +155,7 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
     const unitsInput = str(f, "units", 20);
     const units = unitsInput === "" ? null : Number(unitsInput);
     if (units !== null && (!/^\d+$/.test(unitsInput) || !Number.isSafeInteger(units))) throw new Error("Units available must be a whole number of 0 or more");
-    const images = [...lines(f, "images"), ...(await uploadImages(f, "uploads"))];
+    const images = [...lines(f, "images"), ...(await uploadImages(f, "uploads", "properties"))];
     const doc = {
       title,
       slug: await uniqueSlug("properties", str(f, "slug") || title, id),
@@ -233,7 +233,7 @@ export async function savePost(_prev: FormState, f: FormData): Promise<FormState
     const id = str(f, "id") ? oid(str(f, "id")) : undefined;
     const title = str(f, "title", 200);
     if (!title) throw new Error("Title is required");
-    const [uploaded] = await uploadImages(f, "coverUpload");
+    const [uploaded] = await uploadImages(f, "coverUpload", "blog-post");
     const publishedAt = str(f, "publishedAt") ? new Date(str(f, "publishedAt")) : new Date();
     const doc = {
       title,
