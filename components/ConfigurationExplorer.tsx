@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ComponentType } from "react";
+import { useState } from "react";
 import {
   ArrowUpDown,
   Baby,
@@ -25,6 +25,7 @@ import {
   Wifi,
   Wind,
   Zap,
+  type LucideIcon,
 } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import { variantPrice, variantSize } from "@/lib/variants";
@@ -39,16 +40,14 @@ export type ConfigurationOption = Pick<PropertyVariant, "name" | "price" | "base
   availableFrom?: string;
 };
 
-type Icon = ComponentType<{ className?: string }>;
-
-const GROUP_ICONS: Record<FeatureGroup, Icon> = {
+const GROUP_ICONS: Record<FeatureGroup, LucideIcon> = {
   Interior: Sofa,
   Outdoor: Trees,
   Utilities: Zap,
   Other: Sparkles,
 };
 
-function amenityIcon(label: string, group: string): Icon {
+function amenityIcon(label: string, group: string): LucideIcon {
   const t = label.toLowerCase();
   if (/pool|swim/.test(t)) return Waves;
   if (/gym|fitness/.test(t)) return Dumbbell;
@@ -80,7 +79,7 @@ export function ConfigurationExplorer({ options, listingType }: { options: Confi
     option.bathrooms ? { Icon: Bath, text: `${option.bathrooms} bath${option.bathrooms === 1 ? "" : "s"}` } : null,
     option.parking ? { Icon: Car, text: `${option.parking} parking` } : null,
     option.availableFrom ? { Icon: CalendarDays, text: `Available ${option.availableFrom}` } : null,
-  ].filter((fact): fact is { Icon: Icon; text: string } => fact !== null);
+  ].filter((fact): fact is { Icon: LucideIcon; text: string } => fact !== null);
 
   const groups = Object.entries(option.features ?? {}).filter(([, items]) => items.length) as [FeatureGroup, string[]][];
   const multi = options.length > 1;
