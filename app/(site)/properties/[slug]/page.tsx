@@ -8,7 +8,7 @@ import { PropertyCard } from "@/components/PropertyCard";
 import { Gallery, ScheduleTour, ShareActions } from "@/components/PropertyInteractive";
 import { WhatsApp } from "@/components/icons";
 import { formatPrice, priceToRupees } from "@/lib/format";
-import { variantPrice } from "@/lib/variants";
+import { configurationLabel, variantPrice } from "@/lib/variants";
 import { getProperties, getProperty, getSettings } from "@/lib/data";
 import { whatsappLink } from "@/lib/site";
 import { JsonLd } from "@/components/JsonLd";
@@ -172,7 +172,7 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[s
               <EnquiryForm type="property" subject={`Enquiry for ${p.title} (ID ${p.ref})`} fields={[
                 { name: "Full name", required: true },
                 { name: "Mobile", type: "tel", required: true },
-                ...(options.length > 1 ? [{ name: "Configuration", options: options.map((option) => `${option.name} · ${option.sqft.toLocaleString("en-IN")} ft²${option.sqftMax && option.sqftMax !== option.sqft ? "+" : ""}`) }] : []),
+                ...(options.length > 1 ? [{ name: "Configuration", options: options.map(configurationLabel) }] : []),
               ]} submitLabel="Request details" />
             </div>
             <details id="tour" className="group mt-5 border-t border-line pt-5">
