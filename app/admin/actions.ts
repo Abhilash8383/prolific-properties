@@ -3,7 +3,7 @@
 import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from "cloudinary";
 import { ObjectId } from "mongodb";
-import { updateTag } from "next/cache";
+import { refresh, revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { collection } from "@/lib/db";
 import { createSession, destroySession, requireAdmin } from "@/lib/auth";
@@ -15,6 +15,18 @@ import { allowRequest } from "@/lib/rate-limit";
 import { CATEGORIES, ENQUIRY_STATUSES, FEATURE_GROUPS, LISTING_TYPES, PLACEMENTS, STATUSES, type Placement, type PropertyVariant } from "@/lib/types";
 
 export type FormState = { ok?: boolean; error?: string; message?: string } | null;
+
+function bustPublic(tag: string) {
+  updateTag(tag);
+}
+
+function bustAdmin(...paths: string[]) {
+  for (const path of paths) {
+    if (path.includes("[")) revalidatePath(path, "page");
+    else revalidatePath(path);
+  }
+  refresh();
+}
 
 const str = (f: FormData, k: string, max = 5000) => String(f.get(k) ?? "").trim().slice(0, max);
 const num = (f: FormData, k: string) => {
@@ -234,20 +246,23 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
     return { ok: true };
   });
   if ("error" in result) return result;
-  updateTag(TAGS.properties);
+  bustPublic(TAGS.properties);
+  bustAdmin("/admin", "/admin/properties", "/admin/properties/[id]");
   redirect("/admin/properties");
 }
 
 export async function deleteProperty(id: string) {
   await requireAdmin();
   await (await collection("properties")).deleteOne({ _id: oid(id) });
-  updateTag(TAGS.properties);
+  bustPublic(TAGS.properties);
+  bustAdmin("/admin", "/admin/properties", "/admin/properties/[id]");
 }
 
 export async function togglePropertyField(id: string, field: "published", value: boolean) {
   await requireAdmin();
   await (await collection("properties")).updateOne({ _id: oid(id) }, { $set: { [field]: value, updatedAt: new Date() } });
-  updateTag(TAGS.properties);
+  bustPublic(TAGS.properties);
+  bustAdmin("/admin", "/admin/properties", "/admin/properties/[id]");
 }
 
 export async function togglePlacement(id: string, placement: Placement, on: boolean) {
@@ -257,7 +272,8 @@ export async function togglePlacement(id: string, placement: Placement, on: bool
     { _id: oid(id) },
     { [on ? "$addToSet" : "$pull"]: { placements: placement }, $set: { updatedAt: new Date() } },
   );
-  updateTag(TAGS.properties);
+  bustPublic(TAGS.properties);
+  bustAdmin("/admin", "/admin/properties", "/admin/properties/[id]");
 }
 
 /* ---------- Blog ---------- */

@@ -25,7 +25,7 @@ export function PropertyForm({ p }: { p?: Property }) {
         </ol>
       </div>
 
-      <div className="grid gap-6">
+      <div key={p?.updatedAt ?? "new"} className="grid gap-6">
         <Panel step={1} title="Property details" text="The name and story buyers see first.">
           <Input label="Property name" name="title" defaultValue={p?.title} required placeholder="e.g. Skyline Ariana Residences" />
           <div className="grid gap-4 sm:grid-cols-2">
@@ -73,7 +73,7 @@ export function PropertyForm({ p }: { p?: Property }) {
           title="Home types & prices"
           text="Add one block per home type (for example 2 BHK and 3 BHK). The first one sets the starting price on cards."
         >
-          <VariantEditor p={p} />
+          <VariantEditor key={p?.updatedAt ?? "new"} p={p} />
         </Panel>
 
         <Panel step={4} title="Photos" text="The first photo is the cover on cards and Google results.">
