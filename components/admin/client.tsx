@@ -214,8 +214,8 @@ export function AdminNav({ email, newEnquiries, logout }: { email: string; newEn
       {open && <div className="fixed inset-x-0 top-14 bottom-0 z-40 flex flex-col overflow-y-auto bg-brand-950 p-4 lg:hidden">{nav}</div>}
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col bg-brand-950 p-4 lg:flex">
         <Link href="/admin" className="mb-6 block rounded-xl bg-white p-3" aria-label="Prolific Properties admin home">
-          <Image src="/brand/prolific-logo.png" alt="Prolific Properties" width={1200} height={336} className="h-auto w-full" />
-          <span className="mt-2 block text-[10px] font-semibold tracking-[0.3em] text-brand-700">ADMIN PANEL</span>
+          <Image src="/brand/prolific-logo.png" alt="Prolific Properties" width={1200} height={336} className="mx-auto h-auto w-40 max-w-full" />
+          <span className="mt-2 block text-center text-[10px] font-semibold tracking-[0.3em] text-brand-700">ADMIN PANEL</span>
         </Link>
         {nav}
       </aside>

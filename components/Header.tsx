@@ -20,7 +20,7 @@ function HeaderChrome({
   return (
     <header className="sticky top-0 z-40 border-b border-line/70 bg-white/85 backdrop-blur-lg">
       <div className="container-x flex h-18 items-center justify-between gap-6">
-        <Logo />
+        <Logo compact />
         <nav className="hidden items-center gap-1 lg:flex">
           {headerNav.map((n) => (
             <Link
