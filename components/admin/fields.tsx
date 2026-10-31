@@ -1,4 +1,5 @@
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
+import { ChevronDown } from "lucide-react";
 import { inputClass } from "@/components/ui";
 
 function Label({ label, hint, children, className = "" }: { label: string; hint?: string; children: ReactNode; className?: string }) {
@@ -94,6 +95,21 @@ export function FieldGroup({ title, text, children }: { title: string; text?: st
       </div>
       <div className="grid gap-4">{children}</div>
     </div>
+  );
+}
+
+export function OptionalGroup({ title, text, children }: { title: string; text?: string; children: ReactNode }) {
+  return (
+    <details className="group rounded-xl border border-line bg-surface/60 p-4">
+      <summary className="flex cursor-pointer list-none items-start justify-between gap-3 [&::-webkit-details-marker]:hidden">
+        <span>
+          <span className="block text-sm font-semibold text-ink">{title}</span>
+          {text && <span className="mt-0.5 block text-xs text-muted">{text}</span>}
+        </span>
+        <ChevronDown className="mt-0.5 size-4 shrink-0 text-muted transition-transform group-open:rotate-180" />
+      </summary>
+      <div className="mt-4 grid gap-4">{children}</div>
+    </details>
   );
 }
 

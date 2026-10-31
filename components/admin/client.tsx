@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useActionState, useState, useTransition, type ReactNode } from "react";
+import { useActionState, useState, useTransition, type FormEvent, type ReactNode } from "react";
 import { BriefcaseBusiness, Building2, FileText, Inbox, LayoutDashboard, LogOut, Menu, MessageSquareQuote, Settings, UserCog, X } from "lucide-react";
 import { primaryButton } from "./fields";
 import type { FormState } from "@/app/admin/actions";
@@ -14,11 +14,19 @@ export function AdminForm({
   children,
   submitLabel = "Save",
   className = "grid gap-6",
+  footerActions,
+  showSubmit = true,
+  noValidate = false,
+  onBeforeSubmit,
 }: {
   action: (prev: FormState, f: FormData) => Promise<FormState>;
   children: ReactNode;
   submitLabel?: string;
   className?: string;
+  footerActions?: ReactNode;
+  showSubmit?: boolean;
+  noValidate?: boolean;
+  onBeforeSubmit?: (event: FormEvent<HTMLFormElement>) => void;
 }) {
   const [state, formAction, pending] = useActionState(action, null);
   const [uploadError, setUploadError] = useState("");
@@ -26,7 +34,10 @@ export function AdminForm({
     <form
       action={formAction}
       className={className}
+      noValidate={noValidate}
       onSubmit={(event) => {
+        onBeforeSubmit?.(event);
+        if (event.defaultPrevented) return;
         const files = Array.from(event.currentTarget.querySelectorAll<HTMLInputElement>('input[type="file"]'))
           .flatMap((input) => Array.from(input.files ?? []));
         if (files.some((file) => !isAcceptedImageType(file.type))) {
@@ -42,9 +53,10 @@ export function AdminForm({
     >
       {children}
       <div className="sticky bottom-0 -mx-1 flex flex-wrap items-center gap-4 bg-surface/90 px-1 py-3 backdrop-blur">
-        <button disabled={pending} className={primaryButton}>
+        {footerActions}
+        {showSubmit && <button disabled={pending} className={primaryButton}>
           {pending ? "Saving..." : submitLabel}
-        </button>
+        </button>}
         {state?.error && <p className="text-sm font-medium text-red-600">{state.error}</p>}
         {uploadError && <p className="text-sm font-medium text-red-600">{uploadError}</p>}
         {state?.message && <p className="text-sm font-medium text-emerald-600">{state.message}</p>}

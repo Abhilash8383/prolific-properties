@@ -14,7 +14,7 @@ export default async function EditProperty({ params }: PageProps<"/admin/propert
     <>
       <PageHeader
         title={p.title}
-        text={`Editing property #${p.ref}. Work top to bottom, then save.`}
+        text={`Editing property #${p.ref}. Move between steps and save when ready.`}
         action={
           p.published && (
             <Link href={`/properties/${p.slug}`} target="_blank" className={secondaryButton}>
