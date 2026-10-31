@@ -15,7 +15,7 @@ export function variantMaxSqft(v: Option): number {
 }
 
 export function formatSizeRange(min: number, max = min): string {
-  return `${min.toLocaleString("en-IN")}${max > min ? `–${max.toLocaleString("en-IN")}` : ""} ft²`;
+  return `${min.toLocaleString("en-IN")}${max > min ? `–${max.toLocaleString("en-IN")}` : ""} sq.ft`;
 }
 
 export function variantSize(v: Option): string {

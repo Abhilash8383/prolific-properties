@@ -152,7 +152,7 @@ const seeds: Seed[] = [
   },
   {
     title: "Green Meadows Plots", developer: "GLS Group", category: "Plot", status: "Ready to Move",
-    price: 3600000, configurations: "1,200 - 2,400 ft² plots", area: "Janla", bedrooms: 0, bathrooms: 0, sqft: 1200, parking: 0,
+    price: 3600000, configurations: "1,200 - 2,400 sq.ft plots", area: "Janla", bedrooms: 0, bathrooms: 0, sqft: 1200, parking: 0,
     availableFrom: "Immediate", cover: "1500382017468-9049fed747ef", extra: [img("1628624747186-a941c476b7ef")],
     summary: "BDA-approved residential plots with wide internal roads, ready for registration and construction.",
     description: [
@@ -163,7 +163,7 @@ const seeds: Seed[] = [
       Interior: [], Outdoor: ["40 ft Roads", "Park", "Avenue Plantation"],
       Utilities: ["Electricity", "Underground Drainage", "Water Supply"], Other: ["BDA Approved", "Clear Title", "Gated Layout"],
     },
-    floorPlans: [["1,200 ft² plot", 1200, 3600000], ["2,400 ft² plot", 2400, 7000000]],
+    floorPlans: [["1,200 sq.ft plot", 1200, 3600000], ["2,400 sq.ft plot", 2400, 7000000]],
   },
   {
     title: "Lakeview Heights", developer: "Utkal Builders", category: "Apartment", status: "Ready to Move",
@@ -193,7 +193,7 @@ const seeds: Seed[] = [
   },
   {
     title: "Infocity Business Hub", developer: "Stalwart", category: "Commercial", status: "Ready to Move",
-    price: 8500000, configurations: "Office spaces 800 - 5,000 ft²", area: "Infocity, Patia", bedrooms: 0, bathrooms: 2, sqft: 1000, parking: 2,
+    price: 8500000, configurations: "Office spaces 800 - 5,000 sq.ft", area: "Infocity, Patia", bedrooms: 0, bathrooms: 2, sqft: 1000, parking: 2,
     availableFrom: "Immediate", cover: "1497366216548-37526070297c", extra: [img("1497366811353-6870744d04b2"), img("1554469384-e58fac16e23a")],
     summary: "Grade-A office spaces next to Infocity with plug-and-play options and ample parking.",
     description: [
@@ -204,7 +204,7 @@ const seeds: Seed[] = [
       Interior: ["Central AC", "Conference Rooms", "Food Court"], Outdoor: ["Multi-level Parking", "Landscaped Plaza"],
       Utilities: ["100% Power Backup", "High-speed Internet", "Fire Safety"], Other: ["Access Control", "24x7 Security", "Visitor Management"],
     },
-    floorPlans: [["Office 1,000 ft²", 1000, 8500000], ["Office 2,500 ft²", 2500, 20500000]],
+    floorPlans: [["Office 1,000 sq.ft", 1000, 8500000], ["Office 2,500 sq.ft", 2500, 20500000]],
   },
   {
     title: "Serene Greens Apartment", developer: "GLS Group", category: "Apartment", listingType: "Rent", status: "Ready to Move",

@@ -164,7 +164,7 @@ export function VariantEditor({ p }: { p?: Property }) {
               <FieldGroup title="2. Size" text="Enter one size. Turn on the range only when homes of this type vary in size.">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Input
-                    label={v.sizeMode === "range" ? "Smallest size (ft²)" : "Size (ft²)"}
+                    label={v.sizeMode === "range" ? "Smallest size (sq.ft)" : "Size (sq.ft)"}
                     name={`${key}.sqft`}
                     type="number"
                     min={0}
@@ -177,7 +177,7 @@ export function VariantEditor({ p }: { p?: Property }) {
                   />
                   {v.sizeMode === "range" ? (
                     <Input
-                      label="Largest size (ft²)"
+                      label="Largest size (sq.ft)"
                       name={`${key}.sqftMax`}
                       type="number"
                       min={v.sqft}
@@ -270,7 +270,7 @@ export function VariantEditor({ p }: { p?: Property }) {
                             required
                           />
                           <Input
-                            label="Smallest size (ft²)"
+                            label="Smallest size (sq.ft)"
                             name={`${key}.plans.${planIndex}.sqft`}
                             type="number"
                             min={Math.max(1, v.sqft)}
@@ -283,7 +283,7 @@ export function VariantEditor({ p }: { p?: Property }) {
                             required
                           />
                           <Input
-                            label="Largest size (ft²)"
+                            label="Largest size (sq.ft)"
                             name={`${key}.plans.${planIndex}.sqftMax`}
                             type="number"
                             min={Math.max(1, plan.sqft)}
