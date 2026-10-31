@@ -8,11 +8,11 @@ import { submitEnquiry } from "@/app/(site)/actions";
 
 export function Gallery({ images, title }: { images: string[]; title: string }) {
   const [active, setActive] = useState(0);
-  if (!images.length) return <div className="aspect-16/10 rounded-3xl bg-surface" />;
+  if (!images.length) return <div className="grid aspect-square place-items-center rounded-3xl bg-white text-sm text-muted">Photos coming soon</div>;
   return (
     <div className="grid gap-3">
-      <div className="relative h-64 overflow-hidden rounded-2xl bg-surface sm:h-[26rem] sm:rounded-3xl lg:h-[30rem]">
-        <Image key={images[active]} src={images[active]} alt={title} fill loading="eager" sizes="(min-width:1280px) 80rem, 100vw" className="object-cover reveal-in" />
+      <div className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-white sm:rounded-3xl">
+        <Image key={images[active]} src={images[active]} alt={`${title} — photo ${active + 1}`} fill loading="eager" sizes="(min-width:1024px) 55vw, 100vw" className="object-contain reveal-in" />
         {images.length > 1 &&
           ([
             [-1, "left-3", ChevronLeft, "Previous photo"],
@@ -38,11 +38,11 @@ export function Gallery({ images, title }: { images: string[]; title: string }) 
             aria-label={`View photo ${i + 1} of ${images.length}`}
             aria-pressed={i === active}
             onClick={() => setActive(i)}
-            className={`relative aspect-4/3 w-20 shrink-0 overflow-hidden rounded-xl ring-2 transition sm:w-28 sm:rounded-2xl ${
+            className={`relative aspect-square w-20 shrink-0 overflow-hidden rounded-xl border border-line bg-white ring-2 ring-inset transition sm:w-24 sm:rounded-2xl ${
               i === active ? "ring-brand-600" : "opacity-70 ring-transparent hover:opacity-100"
             }`}
           >
-            <Image src={src} alt="" fill sizes="200px" className="object-cover" />
+            <Image src={src} alt="" fill sizes="100px" className="object-contain" />
           </button>
         ))}
       </div>

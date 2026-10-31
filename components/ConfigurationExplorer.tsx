@@ -75,12 +75,12 @@ export function ConfigurationExplorer({ options, listingType }: { options: Confi
   const soldOut = isSoldOut(option);
 
   const facts = [
-    { Icon: Ruler, text: variantSize(option) },
-    option.bedrooms ? { Icon: BedDouble, text: `${option.bedrooms} bed${option.bedrooms === 1 ? "" : "s"}` } : null,
-    option.bathrooms ? { Icon: Bath, text: `${option.bathrooms} bath${option.bathrooms === 1 ? "" : "s"}` } : null,
-    option.parking ? { Icon: Car, text: `${option.parking} parking` } : null,
-    option.availableFrom ? { Icon: CalendarDays, text: `Available ${option.availableFrom}` } : null,
-  ].filter((fact): fact is { Icon: LucideIcon; text: string } => fact !== null);
+    { Icon: Ruler, label: "Size", text: variantSize(option) },
+    { Icon: BedDouble, label: "Bedrooms", text: String(option.bedrooms ?? "Not provided") },
+    { Icon: Bath, label: "Bathrooms", text: String(option.bathrooms ?? "Not provided") },
+    { Icon: Car, label: "Parking spaces", text: String(option.parking ?? "Not provided") },
+    { Icon: CalendarDays, label: "Available from", text: option.availableFrom || "Please enquire" },
+  ];
 
   const groups = Object.entries(option.features ?? {}).filter(([, items]) => items.length) as [FeatureGroup, string[]][];
   const multi = options.length > 1;
@@ -89,12 +89,12 @@ export function ConfigurationExplorer({ options, listingType }: { options: Confi
     <section id="homes" className="scroll-mt-28 rounded-3xl border border-line bg-white p-5 md:p-7">
       <div>
         <p className="text-xs font-semibold tracking-widest text-brand-700 uppercase">Homes & prices</p>
-        <h2 className="mt-2 text-2xl font-bold text-ink">{multi ? "Home types" : option.name}</h2>
-        {multi && <p className="mt-1 text-sm text-muted">Pick a home type to see size, price and amenities.</p>}
+        <h2 className="mt-2 text-2xl font-bold text-ink">{multi ? "Find the right home for you" : option.name}</h2>
+        {multi && <p className="mt-2 text-sm leading-relaxed text-muted">Compare the options below, then select one to explore its rooms, floor plans and features.</p>}
       </div>
 
       {multi && (
-        <div role="tablist" aria-label="Home types" className="no-scrollbar mt-6 flex gap-2 overflow-x-auto pb-1">
+        <div role="tablist" aria-label="Home types" className="mt-6 grid gap-3 sm:grid-cols-2">
           {options.map((item, index) => {
             const active = selected === index;
             return (
@@ -105,6 +105,7 @@ export function ConfigurationExplorer({ options, listingType }: { options: Confi
                 role="tab"
                 aria-selected={active}
                 aria-controls="home-panel"
+                tabIndex={active ? 0 : -1}
                 onClick={() => setSelected(index)}
                 onKeyDown={(event) => {
                   if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
@@ -113,15 +114,32 @@ export function ConfigurationExplorer({ options, listingType }: { options: Confi
                   setSelected(next);
                   document.getElementById(`home-tab-${next}`)?.focus();
                 }}
-                className={`shrink-0 rounded-2xl border px-4 py-3 text-left transition duration-200 ${
+                className={`min-w-0 rounded-2xl border-2 p-4 text-left transition duration-200 ${
                   active
                     ? "border-brand-600 bg-brand-50 shadow-sm shadow-brand-900/5"
                     : "border-line bg-white hover:border-brand-300"
                 }`}
               >
-                <span className={`block text-sm ${active ? "font-semibold text-brand-700" : "font-medium text-ink"}`}>{item.name}</span>
-                <span className={`mt-0.5 block text-xs ${active ? "text-brand-700/80" : "text-muted"}`}>
-                  {isSoldOut(item) ? "Sold out" : formatPrice({ price: variantPrice(item), listingType })}
+                <span className="flex items-center justify-between gap-2">
+                  <span className="text-base font-semibold text-ink">{item.name}</span>
+                  <span className={`rounded-full px-2 py-1 text-[11px] font-medium ${active ? "bg-brand-600 text-white" : "bg-surface text-muted"}`}>{active ? "Selected" : "View details"}</span>
+                </span>
+                <span className="mt-1 block text-sm text-muted">{variantSize(item)}</span>
+                <span className="mt-3 grid grid-cols-3 gap-2 border-y border-line py-3">
+                  {([
+                    ["Bedrooms", item.bedrooms],
+                    ["Bathrooms", item.bathrooms],
+                    ["Parking", item.parking],
+                  ] as const).map(([label, count]) => (
+                    <span key={label} className="min-w-0">
+                      <span className="block text-[11px] font-normal text-muted">{label}</span>
+                      <span className="mt-1 block text-sm font-semibold text-ink">{count ?? "Not provided"}</span>
+                    </span>
+                  ))}
+                </span>
+                <span className="mt-3 block text-lg font-bold text-brand-700">{formatPrice({ price: variantPrice(item), listingType })}<span className="ml-1 text-xs font-normal text-muted">onwards</span></span>
+                <span className={`mt-2 block text-xs font-medium ${isSoldOut(item) ? "text-red-700" : "text-muted"}`}>
+                  {isSoldOut(item) ? "Sold out" : typeof item.units === "number" ? `${item.units} unit${item.units === 1 ? "" : "s"} available` : "Contact us for unit availability"}
                 </span>
               </button>
             );
@@ -133,6 +151,7 @@ export function ConfigurationExplorer({ options, listingType }: { options: Confi
         key={selected}
         id="home-panel"
         role="tabpanel"
+        tabIndex={0}
         aria-labelledby={multi ? `home-tab-${selected}` : undefined}
         className="reveal-in mt-6 space-y-6"
       >
@@ -140,24 +159,28 @@ export function ConfigurationExplorer({ options, listingType }: { options: Confi
           <div>
             {multi && <h3 className="text-xl font-bold text-ink">{option.name}</h3>}
             <p className={`${multi ? "mt-1" : ""} text-sm text-muted`}>{option.status}</p>
-            {soldOut && <span className="mt-2 inline-flex rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">Sold out</span>}
+            <span className={`mt-3 inline-flex rounded-full px-3 py-1.5 text-xs font-semibold ${soldOut ? "bg-red-50 text-red-700" : "bg-brand-50 text-brand-700"}`}>
+              {soldOut ? "Sold out" : typeof option.units === "number" ? `${option.units} unit${option.units === 1 ? "" : "s"} available` : "Unit availability: please enquire"}
+            </span>
           </div>
-          <div className="sm:text-right">
+          {(!multi || option.basePrice) && <div className="sm:text-right">
+            {!multi && <>
             <p className="text-xs font-medium text-muted">{soldOut ? "Last listed price" : listingType === "Rent" ? "Rent from" : "Price from"}</p>
             <p className="mt-1 text-2xl font-bold text-brand-700">{formatPrice({ price: variantPrice(option), listingType })}</p>
+            </>}
             {option.basePrice && (
               <p className="mt-1 text-xs text-muted">Base rate: {formatPrice({ price: option.basePrice, listingType })}</p>
             )}
-          </div>
+          </div>}
         </div>
 
-        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {facts.map(({ Icon, text }) => (
-            <li key={text} className="flex items-center gap-2.5 rounded-2xl bg-surface px-3.5 py-3 text-sm text-ink">
+        <ul className="grid grid-cols-2 gap-3 xl:grid-cols-3">
+          {facts.map(({ Icon, label, text }) => (
+            <li key={label} className="flex items-center gap-2.5 rounded-2xl bg-surface px-3.5 py-3 text-sm text-ink">
               <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-white text-brand-700 shadow-sm shadow-brand-900/5">
                 <Icon className="size-4" />
               </span>
-              <span className="font-medium">{text}</span>
+              <span className="min-w-0"><span className="block text-xs text-muted">{label}</span><span className="mt-1 block font-semibold">{text}</span></span>
             </li>
           ))}
         </ul>

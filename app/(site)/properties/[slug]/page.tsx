@@ -8,7 +8,7 @@ import { PropertyCard } from "@/components/PropertyCard";
 import { Gallery, ScheduleTour, ShareActions } from "@/components/PropertyInteractive";
 import { WhatsApp } from "@/components/icons";
 import { formatPrice, priceToRupees } from "@/lib/format";
-import { configurationLabel, isSoldOut, variantPrice } from "@/lib/variants";
+import { configurationLabel, formatSizeRange, isSoldOut, variantMaxSqft, variantPrice } from "@/lib/variants";
 import { getProperties, getProperty, getSettings } from "@/lib/data";
 import { whatsappLink } from "@/lib/site";
 import { JsonLd } from "@/components/JsonLd";
@@ -16,10 +16,10 @@ import { absoluteUrl, seoMetadata } from "@/lib/seo";
 import type { Property } from "@/lib/types";
 
 const JUMP = [
-  { href: "#homes", label: "Homes" },
-  { href: "#about", label: "About" },
+  { href: "#homes", label: "Home types & prices" },
+  { href: "#about", label: "Project details" },
   { href: "#location", label: "Location" },
-  { href: "#enquire", label: "Enquire" },
+  { href: "#enquire", label: "Contact & visit" },
 ] as const;
 
 export async function generateMetadata({ params }: PageProps<"/properties/[slug]">): Promise<Metadata> {
@@ -43,6 +43,7 @@ function configurationsFor(p: Property): ConfigurationOption[] {
     floorPlans: [],
     bedrooms: Number(plan.name.match(/\b(\d+)\s*BHK\b/i)?.[1]) || undefined,
     soldOut: p.units === 0,
+    units: p.floorPlans.length === 1 ? p.units : null,
     status: p.status,
     availableFrom: p.availableFrom,
     description: "",
@@ -84,6 +85,10 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[s
   const similar = properties.filter((x) => x.slug !== p.slug && (x.category === p.category || x.city === p.city)).slice(0, 3);
   const statuses = new Set(options.map((option) => option.status));
   const availability = allSoldOut ? "https://schema.org/OutOfStock" : availableOptions.some((option) => typeof option.units === "number" && option.units > 0) ? "https://schema.org/InStock" : undefined;
+  const legacyUnits = !p.variants?.length && typeof p.units === "number" ? p.units : null;
+  const knownUnits = legacyUnits !== null || availableOptions.every((option) => typeof option.units === "number");
+  const totalUnits = legacyUnits ?? availableOptions.reduce((total, option) => total + (option.units ?? 0), 0);
+  const sizeRange = formatSizeRange(Math.min(...options.map((option) => option.sqft)), Math.max(...options.map(variantMaxSqft)));
 
   return (
     <div className="bg-surface pb-28 lg:pb-20">
@@ -142,7 +147,24 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[s
           </div>
         </div>
 
-        <div className="mt-6"><Gallery images={p.images} title={p.title} /></div>
+        <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-8">
+          <div className="min-w-0"><Gallery images={p.images} title={p.title} /></div>
+          <section aria-label="Property overview" className="rounded-3xl border border-line bg-white p-5 md:p-7">
+            <p className="text-xs font-semibold tracking-widest text-brand-700 uppercase">At a glance</p>
+            <h2 className="mt-2 text-2xl font-bold text-ink">Your next home in {p.area || p.city}</h2>
+            {p.summary && <p className="mt-3 text-sm leading-relaxed text-muted">{p.summary}</p>}
+            <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-5 border-y border-line py-5">
+              <div><dt className="text-xs text-muted">Home types</dt><dd className="mt-1 text-sm font-semibold text-ink">{options.map((option) => option.name).join(" · ")}</dd></div>
+              <div><dt className="text-xs text-muted">Size range</dt><dd className="mt-1 text-sm font-semibold text-ink">{sizeRange}</dd></div>
+              <div><dt className="text-xs text-muted">Availability</dt><dd className={`mt-1 text-sm font-semibold ${allSoldOut ? "text-red-700" : "text-brand-700"}`}>{allSoldOut ? "Sold out" : knownUnits ? `${totalUnits} units available` : "Enquire for available units"}</dd></div>
+              <div><dt className="text-xs text-muted">Project stage</dt><dd className="mt-1 text-sm font-semibold text-ink">{Array.from(statuses).join(" · ")}</dd></div>
+              {p.developer && <div><dt className="text-xs text-muted">Developer</dt><dd className="mt-1 text-sm font-semibold text-ink">{p.developer}</dd></div>}
+              {p.rera && <div><dt className="text-xs text-muted">RERA registration</dt><dd className="mt-1 break-all text-sm font-semibold text-ink">{p.rera}</dd></div>}
+            </dl>
+            <a href="#homes" className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white hover:bg-brand-700">Compare home types & prices <ChevronRight className="size-4" /></a>
+            <a href="#enquire" className="mt-3 block text-center text-sm font-semibold text-brand-700">Ask a question or book a visit</a>
+          </section>
+        </div>
 
         <nav aria-label="On this page" className="no-scrollbar mt-5 flex gap-2 overflow-x-auto">
           {JUMP.filter((item) => item.href !== "#about" || p.description.length > 0 || p.summary || p.developer || p.rera).map((item) => (
@@ -213,11 +235,11 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[s
                 ...(options.length > 1 ? [{ name: "Home type", options: options.map(configurationLabel) }] : []),
               ]} submitLabel="Request details" />
             </div>
-            <div id="tour" className="mt-6 border-t border-line pt-5">
-              <h3 className="text-sm font-semibold text-ink">Schedule a site visit</h3>
+            <details id="tour" className="mt-6 border-t border-line pt-5">
+              <summary className="cursor-pointer text-sm font-semibold text-brand-700">Schedule a site visit</summary>
               <p className="mt-1 text-sm text-muted">Pick a day and time that works for you.</p>
               <div className="mt-4"><ScheduleTour title={p.title} /></div>
-            </div>
+            </details>
           </aside>
         </div>
 
