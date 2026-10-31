@@ -39,7 +39,7 @@ function configurationsFor(p: Property): ConfigurationOption[] {
     basePrice: "",
     price: String(plan.price || p.price),
     sqft: plan.sqft,
-    sqftMax: plan.sqft,
+    sqftMax: plan.sqftMax ?? plan.sqft,
     floorPlans: [],
     bedrooms: Number(plan.name.match(/\b(\d+)\s*BHK\b/i)?.[1]) || undefined,
     soldOut: p.units === 0,

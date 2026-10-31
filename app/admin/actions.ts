@@ -184,10 +184,12 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
         const planKey = `${key}.plans.${planIndex}`;
         const planName = str(f, `${planKey}.name`, 100);
         const planSqft = num(f, `${planKey}.sqft`);
+        const planSqftMax = num(f, `${planKey}.sqftMax`);
         const planPrice = str(f, `${planKey}.price`, 100);
-        if (!planName || !planPrice || !planSqft) throw new Error(`${name}: each floor plan needs a name, size and price`);
-        if (planSqft < sqft || planSqft > sqftMax) throw new Error(`${name}: ${planName} must be within the size range`);
-        return { name: planName, sqft: planSqft, price: planPrice };
+        if (!planName || !planPrice || !planSqft || !planSqftMax) throw new Error(`${name}: each floor plan needs a name, minimum size, maximum size and price`);
+        if (planSqftMax < planSqft) throw new Error(`${name}: ${planName} maximum size must be at least its minimum size`);
+        if (planSqft < sqft || planSqftMax > sqftMax) throw new Error(`${name}: ${planName} size range must be within the home type size range`);
+        return { name: planName, sqft: planSqft, sqftMax: planSqftMax, price: planPrice };
       });
       return {
         name, basePrice, price, units, soldOut: f.get(`${key}.soldOut`) === "on" || units === 0,
@@ -232,8 +234,8 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
       images,
       features: primary.features,
       floorPlans: variants.flatMap((v) => v.floorPlans?.length
-        ? v.floorPlans.map((plan) => ({ name: `${v.name} · ${plan.name}`, sqft: plan.sqft, price: priceToRupees(plan.price) ?? 0 }))
-        : [{ name: v.name, sqft: v.sqft, price: priceToRupees(v.price) ?? 0 }]),
+        ? v.floorPlans.map((plan) => ({ name: `${v.name} · ${plan.name}`, sqft: plan.sqft, sqftMax: plan.sqftMax, price: priceToRupees(plan.price) ?? 0 }))
+        : [{ name: v.name, sqft: v.sqft, sqftMax: v.sqftMax, price: priceToRupees(v.price) ?? 0 }]),
       variants,
       updatedAt: new Date(),
     };

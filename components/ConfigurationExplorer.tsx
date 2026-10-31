@@ -28,7 +28,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { formatPrice } from "@/lib/format";
-import { isSoldOut, variantPrice, variantSize } from "@/lib/variants";
+import { formatSizeRange, isSoldOut, variantPrice, variantSize } from "@/lib/variants";
 import type { FeatureGroup, ListingType, PropertyVariant, Status } from "@/lib/types";
 
 export type ConfigurationOption = Pick<PropertyVariant, "name" | "price" | "basePrice" | "sqft" | "sqftMax" | "floorPlans" | "features" | "description" | "soldOut"> & {
@@ -182,7 +182,7 @@ export function ConfigurationExplorer({ options, listingType }: { options: Confi
                   {option.floorPlans.map((plan, index) => (
                     <tr key={`${plan.name}-${index}`} className="border-t border-line">
                       <td className="px-4 py-3 font-medium text-ink">{plan.name}</td>
-                      <td className="px-4 py-3 whitespace-nowrap text-muted">{plan.sqft.toLocaleString("en-IN")} ft²</td>
+                      <td className="px-4 py-3 whitespace-nowrap text-muted">{formatSizeRange(plan.sqft, plan.sqftMax ?? plan.sqft)}</td>
                       <td className="px-4 py-3 whitespace-nowrap font-semibold text-ink">
                         {formatPrice({ price: plan.price, listingType })}
                       </td>

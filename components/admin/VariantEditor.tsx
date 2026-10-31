@@ -7,7 +7,7 @@ import { FEATURE_GROUPS, STATUSES, type Property, type PropertyVariant } from "@
 
 type Draft = Omit<PropertyVariant, "features" | "floorPlans"> & {
   features: Record<(typeof FEATURE_GROUPS)[number], string>;
-  floorPlans: { id: number; name: string; sqft: number; price: string }[];
+  floorPlans: { id: number; name: string; sqft: number; sqftMax: number; price: string }[];
 };
 type Row = { id: number; value: Draft };
 
@@ -22,7 +22,7 @@ function draft(v?: PropertyVariant): Draft {
     bathrooms: v?.bathrooms ?? 0,
     sqft: v?.sqft ?? 0,
     sqftMax: v?.sqftMax ?? v?.sqft ?? 0,
-    floorPlans: v?.floorPlans?.map((plan, id) => ({ id, ...plan })) ?? [],
+    floorPlans: v?.floorPlans?.map((plan, id) => ({ id, ...plan, sqftMax: plan.sqftMax ?? plan.sqft })) ?? [],
     parking: v?.parking ?? 0,
     status: v?.status ?? STATUSES[0],
     availableFrom: v?.availableFrom ?? "",
@@ -51,7 +51,7 @@ function initial(p?: Property): Row[] {
   if (p?.floorPlans?.length) {
     return p.floorPlans.map((plan, id) => ({
       id,
-      value: draft({ ...legacy!, name: plan.name, sqft: plan.sqft, price: String(plan.price || p.price) }),
+      value: draft({ ...legacy!, name: plan.name, sqft: plan.sqft, sqftMax: plan.sqftMax ?? plan.sqft, price: String(plan.price || p.price) }),
     }));
   }
   return [{ id: 0, value: draft(legacy || undefined) }];
@@ -185,7 +185,7 @@ export function VariantEditor({ p }: { p?: Property }) {
 
               <FieldGroup
                 title="Floor plan options (optional)"
-                text="Only if this home type has more than one exact plan with its own size and price."
+                text="Add plans with their own size range and price. Use the same minimum and maximum for a single size."
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs text-muted">
@@ -200,7 +200,7 @@ export function VariantEditor({ p }: { p?: Property }) {
                       change(id, {
                         floorPlans: [
                           ...v.floorPlans,
-                          { id: Math.max(-1, ...v.floorPlans.map((plan) => plan.id)) + 1, name: "", sqft: v.sqft, price: v.price },
+                          { id: Math.max(-1, ...v.floorPlans.map((plan) => plan.id)) + 1, name: "", sqft: v.sqft, sqftMax: v.sqftMax ?? v.sqft, price: v.price },
                         ],
                       })
                     }
@@ -214,10 +214,11 @@ export function VariantEditor({ p }: { p?: Property }) {
                     {v.floorPlans.map((plan, planIndex) => (
                       <div
                         key={plan.id}
-                        className="grid items-end gap-3 rounded-xl border border-line bg-white p-3 sm:grid-cols-[1fr_8rem_10rem_auto]"
+                        className="grid items-end gap-3 rounded-xl border border-line bg-white p-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_8rem_8rem_10rem_auto]"
                       >
                         <Input
                           label="Plan name"
+                          wrapClass="sm:col-span-2 lg:col-span-1"
                           name={`${key}.plans.${planIndex}.name`}
                           value={plan.name}
                           onChange={(e) => changePlan(id, plan.id, { name: e.target.value })}
@@ -225,12 +226,21 @@ export function VariantEditor({ p }: { p?: Property }) {
                           required
                         />
                         <Input
-                          label="Size (ft²)"
+                          label="Minimum size (ft²)"
                           name={`${key}.plans.${planIndex}.sqft`}
                           type="number"
                           min={0}
                           value={plan.sqft}
                           onChange={(e) => changePlan(id, plan.id, { sqft: Number(e.target.value) || 0 })}
+                          required
+                        />
+                        <Input
+                          label="Maximum size (ft²)"
+                          name={`${key}.plans.${planIndex}.sqftMax`}
+                          type="number"
+                          min={0}
+                          value={plan.sqftMax}
+                          onChange={(e) => changePlan(id, plan.id, { sqftMax: Number(e.target.value) || 0 })}
                           required
                         />
                         <Input

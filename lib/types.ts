@@ -25,7 +25,7 @@ export type PropertyVariant = {
   bathrooms: number;
   sqft: number;
   sqftMax?: number;
-  floorPlans?: { name: string; sqft: number; price: string }[];
+  floorPlans?: { name: string; sqft: number; sqftMax?: number; price: string }[];
   parking: number;
   status: Status;
   availableFrom: string;
@@ -60,7 +60,7 @@ export type Property = {
   description: string[];
   images: string[];
   features: Record<FeatureGroup, string[]>;
-  floorPlans: { name: string; sqft: number; price: number }[];
+  floorPlans: { name: string; sqft: number; sqftMax?: number; price: number }[];
   variants?: PropertyVariant[];
   createdAt: string;
   updatedAt: string;
