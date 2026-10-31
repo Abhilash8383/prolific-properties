@@ -1,8 +1,8 @@
 import { priceToRupees } from "./format";
 type Option = { price: string; sqft: number; sqftMax?: number; floorPlans?: { sqft: number; sqftMax?: number; price: string | number }[] };
 
-export function isSoldOut(v: { soldOut?: boolean; units?: number | null }): boolean {
-  return v.soldOut === true || v.units === 0;
+export function isSoldOut(v: { soldOut?: boolean }): boolean {
+  return v.soldOut === true;
 }
 
 export function variantPrice(v: Option): string {

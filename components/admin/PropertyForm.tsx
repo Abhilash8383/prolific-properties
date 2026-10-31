@@ -119,6 +119,16 @@ export function PropertyForm({ p }: { p?: Property }) {
         <div data-property-step="0" className={step === 0 ? "grid gap-6" : "hidden"}>
         <Panel title="Property details" text="Start with what buyers need to recognize this property.">
           <Input label="Property name" name="title" defaultValue={p?.title} required placeholder="e.g. Skyline Ariana Residences" />
+          <Input
+            label="Total units available in this property"
+            name="units"
+            type="number"
+            min={0}
+            step={1}
+            defaultValue={p?.units ?? ""}
+            placeholder="e.g. 75"
+            hint="One total across all home types. Leave blank if unknown; enter 0 if the property is sold out."
+          />
           <div className="grid gap-4 sm:grid-cols-2">
             <Select label="For sale or rent?" name="listingType" options={LISTING_TYPES} defaultValue={p?.listingType} />
             <Select label="Property type" name="category" options={CATEGORIES} defaultValue={p?.category} />

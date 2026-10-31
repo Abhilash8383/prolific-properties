@@ -55,8 +55,8 @@ export function PropertyBrowser({ properties }: { properties: Property[] }) {
     .sort((a, b) => {
       if (sort === "price-asc" || sort === "price-desc") {
         const lowest = (p: Property) => {
-          const variants = p.variants?.length ? p.variants : [p];
-          const available = variants.filter((v) => !isSoldOut(v));
+          const variants = p.variants?.length ? p.variants : [{ ...p, soldOut: p.units === 0 }];
+          const available = p.units === 0 ? [] : variants.filter((v) => !isSoldOut(v));
           return Math.min(...(available.length ? available : variants).map((v) => priceToRupees(variantPrice(v)) ?? Infinity));
         };
         const aPrice = lowest(a);

@@ -19,7 +19,6 @@ export type PropertyVariant = {
   name: string;
   basePrice: string;
   price: string;
-  units: number | null;
   soldOut?: boolean;
   bedrooms: number;
   bathrooms: number;

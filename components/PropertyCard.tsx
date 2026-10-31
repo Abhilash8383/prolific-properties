@@ -7,8 +7,8 @@ import type { Property } from "@/lib/types";
 
 export function PropertyCard({ p, layout = "grid" }: { p: Property; layout?: "grid" | "list" }) {
   const list = layout === "list";
-  const variants = p.variants?.length ? p.variants : [p];
-  const available = variants.filter((v) => !isSoldOut(v));
+  const variants = p.variants?.length ? p.variants : [{ ...p, soldOut: p.units === 0 }];
+  const available = p.units === 0 ? [] : variants.filter((v) => !isSoldOut(v));
   const allSoldOut = available.length === 0;
   const someSoldOut = !allSoldOut && available.length < variants.length;
   const priced = available.length ? available : variants;
@@ -66,8 +66,8 @@ export function PropertyCard({ p, layout = "grid" }: { p: Property; layout?: "gr
             </span>
           </div>
           <p className="mt-2 flex min-h-5 items-center gap-1.5 text-sm text-muted">
-            {!allSoldOut && typeof lowest.units === "number" ? (
-              <><Building2 className="size-4 shrink-0 text-brand-600" /> {lowest.units} {lowest.units === 1 ? "unit" : "units"} available</>
+            {!allSoldOut && typeof p.units === "number" ? (
+              <><Building2 className="size-4 shrink-0 text-brand-600" /> {p.units} {p.units === 1 ? "unit" : "units"} available</>
             ) : null}
           </p>
         </div>

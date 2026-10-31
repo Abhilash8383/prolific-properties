@@ -163,6 +163,9 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
     const id = str(f, "id") ? oid(str(f, "id")) : undefined;
     const title = str(f, "title", 200);
     if (!title) throw new Error("Title is required");
+    const unitsInput = str(f, "units", 20);
+    const units = unitsInput === "" ? null : Number(unitsInput);
+    if (units !== null && (!/^\d+$/.test(unitsInput) || !Number.isSafeInteger(units))) throw new Error("Total units available must be a whole number of 0 or more");
     const variantCount = Number(str(f, "variantCount", 3));
     if (!Number.isInteger(variantCount) || variantCount < 1 || variantCount > 30) throw new Error("Add between 1 and 30 configurations");
     const variants: PropertyVariant[] = Array.from({ length: variantCount }, (_, index) => {
@@ -172,9 +175,6 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
       const basePrice = str(f, `${key}.basePrice`, 100);
       if (!name) throw new Error(`Configuration ${index + 1} needs a name`);
       if (!price) throw new Error(`${name} needs a final price`);
-      const unitsInput = str(f, `${key}.units`, 20);
-      const units = unitsInput === "" ? null : Number(unitsInput);
-      if (units !== null && (!/^\d+$/.test(unitsInput) || !Number.isSafeInteger(units))) throw new Error(`${name}: units available must be a whole number of 0 or more`);
       const sqft = num(f, `${key}.sqft`);
       const sqftMax = num(f, `${key}.sqftMax`);
       if (sqftMax < sqft) throw new Error(`${name}: maximum size must be at least the minimum size`);
@@ -192,7 +192,7 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
         return { name: planName, sqft: planSqft, sqftMax: planSqftMax, price: planPrice };
       });
       return {
-        name, basePrice, price, units, soldOut: f.get(`${key}.soldOut`) === "on" || units === 0,
+        name, basePrice, price, soldOut: f.get(`${key}.soldOut`) === "on",
         bedrooms: num(f, `${key}.bedrooms`),
         bathrooms: num(f, `${key}.bathrooms`),
         sqft, sqftMax, floorPlans,
@@ -215,7 +215,7 @@ export async function saveProperty(_prev: FormState, f: FormData): Promise<FormS
       placements: f.getAll("placements").filter((v): v is Placement => typeof v === "string" && v in PLACEMENTS),
       published: f.get("published") === "on",
       price: variantPrice(primary),
-      units: primary.units,
+      units,
       configurations: variants.map((v) => v.name).join(", "),
       area: str(f, "area", 200),
       city: str(f, "city", 100) || "Bhubaneswar",

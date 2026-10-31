@@ -35,7 +35,6 @@ export type ConfigurationOption = Pick<PropertyVariant, "name" | "price" | "base
   bedrooms?: number;
   bathrooms?: number;
   parking?: number;
-  units?: number | null;
   status: Status;
   availableFrom?: string;
 };
@@ -139,7 +138,7 @@ export function ConfigurationExplorer({ options, listingType }: { options: Confi
                 </span>
                 <span className="mt-3 block text-lg font-bold text-brand-700">{formatPrice({ price: variantPrice(item), listingType })}<span className="ml-1 text-xs font-normal text-muted">onwards</span></span>
                 <span className={`mt-2 block text-xs font-medium ${isSoldOut(item) ? "text-red-700" : "text-muted"}`}>
-                  {isSoldOut(item) ? "Sold out" : typeof item.units === "number" ? `${item.units} unit${item.units === 1 ? "" : "s"} available` : "Contact us for unit availability"}
+                  {isSoldOut(item) ? "Sold out" : "Enquire about this home type"}
                 </span>
               </button>
             );
@@ -160,7 +159,7 @@ export function ConfigurationExplorer({ options, listingType }: { options: Confi
             {multi && <h3 className="text-xl font-bold text-ink">{option.name}</h3>}
             <p className={`${multi ? "mt-1" : ""} text-sm text-muted`}>{option.status}</p>
             <span className={`mt-3 inline-flex rounded-full px-3 py-1.5 text-xs font-semibold ${soldOut ? "bg-red-50 text-red-700" : "bg-brand-50 text-brand-700"}`}>
-              {soldOut ? "Sold out" : typeof option.units === "number" ? `${option.units} unit${option.units === 1 ? "" : "s"} available` : "Unit availability: please enquire"}
+              {soldOut ? "Sold out" : "Contact us to confirm this home type"}
             </span>
           </div>
           {(!multi || option.basePrice) && <div className="sm:text-right">

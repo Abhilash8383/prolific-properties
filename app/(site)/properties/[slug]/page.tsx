@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: PageProps<"/properties/[slug]
 }
 
 function configurationsFor(p: Property): ConfigurationOption[] {
-  if (p.variants?.length) return p.variants;
+  if (p.variants?.length) return p.variants.map((variant) => ({ ...variant, soldOut: p.units === 0 || Boolean(variant.soldOut) }));
   if (p.floorPlans?.length) return p.floorPlans.map((plan) => ({
     name: plan.name,
     basePrice: "",
@@ -43,7 +43,6 @@ function configurationsFor(p: Property): ConfigurationOption[] {
     floorPlans: [],
     bedrooms: Number(plan.name.match(/\b(\d+)\s*BHK\b/i)?.[1]) || undefined,
     soldOut: p.units === 0,
-    units: p.floorPlans.length === 1 ? p.units : null,
     status: p.status,
     availableFrom: p.availableFrom,
     description: "",
@@ -59,7 +58,6 @@ function configurationsFor(p: Property): ConfigurationOption[] {
     bedrooms: p.bedrooms,
     bathrooms: p.bathrooms,
     parking: p.parking,
-    units: p.units,
     soldOut: p.units === 0,
     status: p.status,
     availableFrom: p.availableFrom,
@@ -84,10 +82,9 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[s
   const address = [p.area, p.city, p.state, "India"].filter(Boolean).join(", ");
   const similar = properties.filter((x) => x.slug !== p.slug && (x.category === p.category || x.city === p.city)).slice(0, 3);
   const statuses = new Set(options.map((option) => option.status));
-  const availability = allSoldOut ? "https://schema.org/OutOfStock" : availableOptions.some((option) => typeof option.units === "number" && option.units > 0) ? "https://schema.org/InStock" : undefined;
-  const legacyUnits = !p.variants?.length && typeof p.units === "number" ? p.units : null;
-  const knownUnits = legacyUnits !== null || availableOptions.every((option) => typeof option.units === "number");
-  const totalUnits = legacyUnits ?? availableOptions.reduce((total, option) => total + (option.units ?? 0), 0);
+  const availability = allSoldOut ? "https://schema.org/OutOfStock" : typeof p.units === "number" && p.units > 0 ? "https://schema.org/InStock" : undefined;
+  const knownUnits = typeof p.units === "number";
+  const totalUnits = p.units;
   const sizeRange = formatSizeRange(Math.min(...options.map((option) => option.sqft)), Math.max(...options.map(variantMaxSqft)));
 
   return (
@@ -156,7 +153,7 @@ export default async function PropertyPage({ params }: PageProps<"/properties/[s
             <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-5 border-y border-line py-5">
               <div><dt className="text-xs text-muted">Home types</dt><dd className="mt-1 text-sm font-semibold text-ink">{options.map((option) => option.name).join(" · ")}</dd></div>
               <div><dt className="text-xs text-muted">Size range</dt><dd className="mt-1 text-sm font-semibold text-ink">{sizeRange}</dd></div>
-              <div><dt className="text-xs text-muted">Availability</dt><dd className={`mt-1 text-sm font-semibold ${allSoldOut ? "text-red-700" : "text-brand-700"}`}>{allSoldOut ? "Sold out" : knownUnits ? `${totalUnits} units available` : "Enquire for available units"}</dd></div>
+              <div><dt className="text-xs text-muted">Units available in this property</dt><dd className={`mt-1 text-sm font-semibold ${allSoldOut ? "text-red-700" : "text-brand-700"}`}>{allSoldOut ? "Sold out" : knownUnits ? `${totalUnits} units available` : "Enquire for available units"}</dd></div>
               <div><dt className="text-xs text-muted">Project stage</dt><dd className="mt-1 text-sm font-semibold text-ink">{Array.from(statuses).join(" · ")}</dd></div>
               {p.developer && <div><dt className="text-xs text-muted">Developer</dt><dd className="mt-1 text-sm font-semibold text-ink">{p.developer}</dd></div>}
               {p.rera && <div><dt className="text-xs text-muted">RERA registration</dt><dd className="mt-1 break-all text-sm font-semibold text-ink">{p.rera}</dd></div>}

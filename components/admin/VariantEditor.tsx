@@ -18,8 +18,7 @@ function draft(v?: PropertyVariant): Draft {
     name: v?.name ?? "",
     basePrice: v?.basePrice ?? "",
     price: v?.price ?? "",
-    units: v?.units ?? null,
-    soldOut: v?.soldOut ?? v?.units === 0,
+    soldOut: v?.soldOut ?? false,
     bedrooms: v?.bedrooms ?? 0,
     bathrooms: v?.bathrooms ?? 0,
     sqft: v?.sqft ?? 0,
@@ -40,8 +39,7 @@ function initial(p?: Property): Row[] {
     name: p.floorPlans?.[0]?.name || p.configurations || "",
     basePrice: "",
     price: p.price,
-    units: p.units,
-    soldOut: p.units === 0,
+    soldOut: false,
     bedrooms: p.bedrooms,
     bathrooms: p.bathrooms,
     sqft: p.sqft,
@@ -310,8 +308,8 @@ export function VariantEditor({ p }: { p?: Property }) {
                 )}
               </OptionalGroup>
 
-              <OptionalGroup title="Availability & other price details" text={`${v.status}${v.units === null ? " · units unknown" : ` · ${v.units} units available`}${v.basePrice ? " · base rate set" : ""}. Edit only if needed.`}>
-                <div className="grid gap-4 sm:grid-cols-3">
+              <OptionalGroup title="Availability & other price details" text={`${v.status}${v.basePrice ? " · base rate set" : ""}. Edit only if needed.`}>
+                <div className="grid gap-4 sm:grid-cols-2">
                   <Select
                     label="Building stage"
                     name={`${key}.status`}
@@ -326,16 +324,6 @@ export function VariantEditor({ p }: { p?: Property }) {
                     onChange={(e) => change(id, { availableFrom: e.target.value })}
                     placeholder="e.g. March 2027 or Immediate"
                   />
-                  <Input
-                    label="Units available"
-                    name={`${key}.units`}
-                    type="number"
-                    min={0}
-                    step={1}
-                    value={v.units ?? ""}
-                    onChange={(e) => change(id, { units: e.target.value === "" ? null : Number(e.target.value) })}
-                    hint="Leave blank if you do not know"
-                  />
                 </div>
                 <Input
                   label="Base rate (optional)"
@@ -349,10 +337,10 @@ export function VariantEditor({ p }: { p?: Property }) {
                   <Checkbox
                     label="Sold out"
                     name={`${key}.soldOut`}
-                    checked={Boolean(v.soldOut) || v.units === 0}
-                    onChange={(e) => change(id, { soldOut: e.target.checked, ...(e.target.checked ? {} : v.units === 0 ? { units: null } : {}) })}
+                    checked={Boolean(v.soldOut)}
+                    onChange={(e) => change(id, { soldOut: e.target.checked })}
                   />
-                  <p className="mt-1 pl-6.5 text-xs text-muted">Buyers can still find this home type, but it will be marked sold out. Entering 0 units also marks it sold out.</p>
+                  <p className="mt-1 pl-6.5 text-xs text-muted">Marks only this home type as sold out. The total number of available units is entered in Property details.</p>
                 </div>
               </OptionalGroup>
 
